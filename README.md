@@ -4,5 +4,6 @@ A capstone software development project for Bellevue University's Software Devel
 ## Contributors
 * Vee Bell
 * DeJanae Faison
+* Julia Gonzalez
 * Jess Monnier
 * Professor Sue Sampson
