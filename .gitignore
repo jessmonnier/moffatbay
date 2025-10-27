@@ -1,0 +1,51 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Virtual environment ---
+venv/
+.env/
+.venv/
+env/
+ENV/
+
+# --- Django stuff ---
+db.sqlite3
+staticfiles/
+media/
+*.log
+
+# --- Environment & secrets ---
+*.env
+.env.*
+
+# --- IDE / Editor files ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- OS-specific files ---
+.DS_Store
+Thumbs.db
+
+# --- Compiled / cache ---
+*.egg-info/
+build/
+dist/
+
+# --- Coverage / testing ---
+.coverage
+htmlcov/
+*.cover
+*.py,cover
+.tox/
+nosetests.xml
+coverage.xml
+*.spec
+
+# --- Temporary files ---
+*.tmp
+*.bak
+*.orig
