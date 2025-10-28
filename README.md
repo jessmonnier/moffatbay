@@ -11,8 +11,8 @@ A capstone software development project for Bellevue University's Software Devel
 ## Getting Set Up
 * Clone the repo to your computer
 * In a terminal/command line window, move to your repo folder.
-  * For me, that looks like:
   * In File Explorer, you can right-click the folder and click "Copy as path" in the menu to get the path
+  * For me, that looks like:
 ```
 cd "C:\Users\karri\Documents\Coding\csd\moffatbay"
 ```
