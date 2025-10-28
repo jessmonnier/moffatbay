@@ -9,7 +9,7 @@ A capstone software development project for Bellevue University's Software Devel
 * Professor Sue Sampson
 
 ## Getting Set Up
-* Clone the repo to your computer
+* Clone the repo to your computer if you haven't already, or pull down changes
 * In a terminal/command line window, move to your repo folder.
   * In File Explorer, you can right-click the folder and click "Copy as path" in the menu to get the path
   * For me, that looks like:
