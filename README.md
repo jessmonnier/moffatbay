@@ -32,6 +32,11 @@ python -c "from django.core.management.utils import get_random_secret_key; print
 ```
 SOURCE C:/Users/karri/Documents/Coding/csd/moffatbay/database_setup.sql;
 ```
+* In your (venv) command prompt, run the following to ensure Django sets up its needed tables in the database:
+```
+python manage.py makemigrations
+python manage.py migrate
+```
 * With MySQL still running, in your command line that is in your top-level moffatbay folder and your virtual environment (venv), run:
 ```
 python manage.py runserver
