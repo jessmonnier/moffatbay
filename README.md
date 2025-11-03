@@ -45,4 +45,43 @@ python manage.py runserver
 ```
 localhost:8000
 ```
- * That's the website! Well, what we have of it so far.
+ * That should get a local version of the site (so far) up and running on your machine.
+
+## Project Brief for Moffat Bay Lodge
+The following is copied from the Moffat Bay Project page on the course Blackboard.
+
+### Project 1: Moffat Bay Lodge
+They are looking to have you build a website that manages the following:
+
+Customers can view all aspects of the Lodge website without being logged in. To book their vacation (lodge reservation), they must be logged in/registered. In other words, to submit a reservation, prompt users to log in or register for a free account. There are no requirements for payment, but users must “click” a button to confirm their reservation. Once a reservation is confirmed, send the record to the database for insertion. The reservations you save in the database will be used to populate the Reservation Lookup page. All registered users should be saved to a table in the database. This table will be used during the login process to validate their access.
+
+### Project requirements:
+Pages, models, operations, and/or functionality:
+
+- Landing page:
+  - Simple marketing landing page (use the Internet for inspiration on landing pages).
+- About Us page:
+  - Static HTML/CSS content related to Moffat Bay Lodge.
+- Contact Us page:
+  - Static HTML/CSS content related to the Moffat Bay Lodge.
+- Attractions page:
+  - Static HTML/CSS content related to activites available on the island. Hiking, kayaking, whale watching, and scuba diving should be included.
+- Registration page:
+  - Students can pick the number of fields, but at minimum, there should be fields for email address, first name, last name, telephone, and password.
+  - Additional comments:
+    - All customers should be assigned a unique customerId.
+    - All customers should use their email address as the “username” field and the password should be at least 8 characters in length and include one number, one uppercase and one lowercase letter (hint: use regular expression).
+    - Program should check that the username (email) is in standard format, ex. bob@somthing.com.
+  Passwords should be hashed and/or encrypted using standard security practices (use the Internet for ideas/code snippets; be sure to cite all external authors).
+- Login page:
+  - Note: Provide customers with a login form and fields for username (use email address) and password.
+  - Logged in customers should be added to the application’s session.
+- Lodge reservation (book your vacation) page:
+  - Note: You are building a lodge reservation page that allows customers to “book their vacation.” MySQL must be used to save the data.
+  - Form selection options: room size, number of guests, and check-in/check-out dates.
+  - Additional comments:
+    - Room size: double full beds = 120.00 per night, queen = 135.00 per night, double queen beds = 150.00 per night, and king = 160.00 per night.
+- Reservation summary page:
+  - Note: Provide customers with a reservation confirmation summary and a button to either cancel or submit the reservation. Submitted reservation must be saved to MySQL. Canceling the reservation should take users back to the hotel reservation page.
+- Reservation look up page:
+  - Note: Provide customers with a page to look up previous reservation. The page should include a field to search by reservation ID or email address and display a summary of the reservation. List the room size, number of guests, and check-in/check-out dates.
