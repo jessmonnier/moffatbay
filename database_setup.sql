@@ -24,3 +24,21 @@ CREATE TABLE billing_methods(
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
+
+
+-- Rooms Table
+CREATE TABLE IF NOT EXISTS rooms (
+    roomId INT PRIMARY KEY AUTO_INCREMENT,                   -- Unique ID for each room (auto-incremented)
+    room_number VARCHAR(10) NOT NULL UNIQUE,                 -- Room label or number (e.g., "101", "A-12")
+    room_type ENUM('Single', 'Double', 'Queen', 'King', 'Suite') NOT NULL, -- Room category or bed size
+    beds TINYINT UNSIGNED NOT NULL DEFAULT 1,                -- Number of beds in the room
+    max_occupancy TINYINT UNSIGNED NOT NULL DEFAULT 2,       -- Maximum number of guests allowed
+    rate_per_night DECIMAL(10,2) NOT NULL,                   -- Cost per night (used to calculate total stay charges)
+    description TEXT,                                        -- Optional description (e.g., "Ocean view with balcony")
+    status ENUM('Available', 'Occupied', 'Cleaning', 'Maintenance') 
+           NOT NULL DEFAULT 'Available',                     -- Current room status (for availability tracking)
+    amenities VARCHAR(255),                                  -- Optional list of amenities (e.g., "WiFi, Mini-fridge, TV")
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,          -- Date/time the record was created
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
+               ON UPDATE CURRENT_TIMESTAMP                   -- Automatically updates when record changes
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
