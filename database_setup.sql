@@ -9,8 +9,20 @@ CREATE USER IF NOT EXISTS 'PLACEHOLDER_USER'@'localhost' IDENTIFIED BY 'PLACEHOL
 GRANT ALL PRIVILEGES ON moffatbay.* TO 'PLACEHOLDER_USER'@'localhost';
 FLUSH PRIVILEGES;
 
--- Customers table
+-- Disable FK checks temporarily so all drops succeed
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- Drop tables in reverse dependency order
+DROP TABLE IF EXISTS reservations;
+DROP TABLE IF EXISTS rooms;
+DROP TABLE IF EXISTS room_types;
+DROP TABLE IF EXISTS billing_methods;
 DROP TABLE IF EXISTS customers;
+
+-- Re-enable FK checks
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- Customers table
 CREATE TABLE customers(
     customer_id INT PRIMARY KEY AUTO_INCREMENT,
     first_name VARCHAR(35) NOT NULL,
@@ -27,7 +39,6 @@ CREATE TABLE customers(
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Billing Method Table
-DROP TABLE IF EXISTS billing_methods;
 CREATE TABLE billing_methods(
 	billing_id int primary key auto_increment,
     customer_id int not null,
@@ -54,7 +65,6 @@ REFERENCES billing_methods(billing_id)
 ON DELETE SET NULL;
 
 -- Room Types table
-DROP TABLE IF EXISTS room_types;
 CREATE TABLE room_types(
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(25) NOT NULL,
@@ -65,7 +75,6 @@ CREATE TABLE room_types(
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Rooms Table
-DROP TABLE IF EXISTS rooms;
 CREATE TABLE rooms (
     room_id INT PRIMARY KEY AUTO_INCREMENT,
     room_number VARCHAR(20) NOT NULL UNIQUE,
@@ -82,7 +91,6 @@ CONSTRAINT fk_room_type
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Reservations Table
-DROP TABLE IF EXISTS reservations;
 CREATE TABLE reservations(
     reservation_id CHAR(36) PRIMARY KEY DEFAULT (UUID()), -- make a better user-facing res ID
     customer_id INT,
