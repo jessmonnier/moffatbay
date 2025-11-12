@@ -34,35 +34,35 @@ CREATE TABLE customers(
     address_street VARCHAR(254),
     address_city VARCHAR(35),
     address_state VARCHAR(35),
-    address_zipcode VARCHAR(25),
-    default_billing_id INT
+    address_zipcode VARCHAR(25)
+--    default_billing_id INT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Billing Method Table
-CREATE TABLE billing_methods(
-	billing_id int primary key auto_increment,
-    customer_id int not null,
-    type ENUM('Paypal','Apple Pay','Cash App','Credit Card','Gift Card') not null, -- Fixed Payment methods
-    name varchar(48),
-    address_country VARCHAR(35),
-    address_street VARCHAR(254),
-    address_city VARCHAR(35),
-    address_state VARCHAR(35),
-    address_zipcode VARCHAR(25),
+-- -- Billing Method Table - removed at least for now
+-- CREATE TABLE billing_methods(
+-- 	billing_id int primary key auto_increment,
+--     customer_id int not null,
+--     type ENUM('Paypal','Apple Pay','Cash App','Credit Card','Gift Card') not null, -- Fixed Payment methods
+--     name varchar(48),
+--     address_country VARCHAR(35),
+--     address_street VARCHAR(254),
+--     address_city VARCHAR(35),
+--     address_state VARCHAR(35),
+--     address_zipcode VARCHAR(25),
 	
-  CONSTRAINT fk_billing_customer
-		FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
-        -- If customer updates or deletes information automatically update and delete
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+--   CONSTRAINT fk_billing_customer
+-- 		FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+--         -- If customer updates or deletes information automatically update and delete
+--         ON DELETE CASCADE
+--         ON UPDATE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Set up foreign key relationship between customers table and default_billing_id
-ALTER TABLE customers
-ADD CONSTRAINT fk_default_billing
-FOREIGN KEY (default_billing_id)
-REFERENCES billing_methods(billing_id)
-ON DELETE SET NULL;
+-- -- Set up foreign key relationship between customers table and default_billing_id
+-- ALTER TABLE customers
+-- ADD CONSTRAINT fk_default_billing
+-- FOREIGN KEY (default_billing_id)
+-- REFERENCES billing_methods(billing_id)
+-- ON DELETE SET NULL;
 
 -- Room Types table
 CREATE TABLE room_types(
@@ -192,23 +192,23 @@ VALUES
  NULL, 'Confirmed',
  '2025-08-20', '2025-08-25', 1, (select room_id from rooms where room_number = "101" limit 1));
 
- -- Add one billing method per existing customer
-INSERT INTO billing_methods (customer_id, type, name, address_country, address_street, address_city, address_state, address_zipcode)
-VALUES
--- Customer 1: Brian Murphy
-(1, 'Credit Card', 'My Visa - ...1234', 'USA', '102 Beach Ave', 'San Juan Island', 'WA', '98250'),
--- Customer 2: Maria Lopez
-(2, 'Paypal', 'Paypal', 'USA', '44 Harbor View Rd', 'Friday Harbor', 'WA', '98250'),
--- Customer 3: Carla Mendoza
-(3, 'Credit Card', 'Company Visa - ...4321', 'USA', '900 Maple Dr', 'Seattle', 'WA', '98101');
+--  -- Add one billing method per existing customer - removed for now
+-- INSERT INTO billing_methods (customer_id, type, name, address_country, address_street, address_city, address_state, address_zipcode)
+-- VALUES
+-- -- Customer 1: Brian Murphy
+-- (1, 'Credit Card', 'My Visa - ...1234', 'USA', '102 Beach Ave', 'San Juan Island', 'WA', '98250'),
+-- -- Customer 2: Maria Lopez
+-- (2, 'Paypal', 'Paypal', 'USA', '44 Harbor View Rd', 'Friday Harbor', 'WA', '98250'),
+-- -- Customer 3: Carla Mendoza
+-- (3, 'Credit Card', 'Company Visa - ...4321', 'USA', '900 Maple Dr', 'Seattle', 'WA', '98101');
 
--- Now update each customer's default_billing_id to the corresponding billing_id
-UPDATE customers 
-SET default_billing_id = (
-    SELECT billing_id FROM billing_methods 
-    WHERE billing_methods.customer_id = customers.customer_id
-)
-WHERE customer_id IN (1, 2, 3);
+-- -- Now update each customer's default_billing_id to the corresponding billing_id
+-- UPDATE customers 
+-- SET default_billing_id = (
+--     SELECT billing_id FROM billing_methods 
+--     WHERE billing_methods.customer_id = customers.customer_id
+-- )
+-- WHERE customer_id IN (1, 2, 3);
 
 -- Display table contents
 SELECT * FROM customers;
