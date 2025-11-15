@@ -69,3 +69,7 @@ body{
     border: none;
     cursor: pointer;
 }
+
+
+.bad { color: red; }
+.good { color: green; }
