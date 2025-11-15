@@ -1,7 +1,64 @@
+<!--Navigation extention of base.html -->
 {% extends 'pages/base.html' %}
 
 {% block title %}Home | Moffat Bay Lodge{% endblock %}
 
 {% block content %}
-    <h2>Placeholder - Register</h2>
+    <div class = "registerContainer">
+        
+        {#Registration information#}
+        <div class = "registerHeader">
+            <h2>Register for an Account</h2>
+            <p>To better protect your private data and ensure ease of finding, modifying, 
+                or canceling reservations, all guests who wish to book a stay at Moffat Bay 
+                Lodge must register for an account. Registration also gives you the benefit of 
+                being able to save payment information for future visits, if desired.
+            </p> <br>
+            <p> Moffat Bay Lodge will never give or sell your personal information to any third
+                party. We make it our mission to ensure the comfort and safety of all guests,
+                both in the digital realm and the physical.
+            </p>
+        </div>
+
+        {#Registration Panel#}
+        <div class = "registerPanel">
+            <h3>Create Your Account</h3>
+            <form id = "registerForm" >
+                <label> First Name: </label>
+                <input type = "text" name = "first_name" placeholder = "Jane">
+                <br>
+                <label> Last Name: </label>
+                <input type = "text" name = "last_name" placeholder = "Doe">
+                <br>
+                <label> Email: </label>
+                <input type = "Email" name = "email" placeholder = "example@gmail.com">
+                <br>
+                <label> Phone Number: </label>
+                <input type = "text" name = "phone_number" placeholder = "123-456-7890">
+                <br>
+                <label> Password:</label>
+                <input type = "password" name = "password">
+                <br>
+                <label> Confirm Password:</label>
+                <input type = "password" name = "confirm_password">
+                <br>
+                
+                {#Password requirements#}
+                <div class = "passwordRequirments">
+                    <p> &#10008; Password must be at least 8 characters</p>
+                    <p> &#10008; Must include 1 Number</p>
+                    <p> &#10008; Must include 1 UPPERCASE Letter</p>
+                    <p> &#10008; Must include at least 1 lowercase letter</p>
+                </div>
+
+                <div class = "terms">
+                    <label>I agree to the Terms and Conditions</label>
+                    <input type = "checkbox" name="agreedToTerms">
+                </div>
+                <button id="submitButton">Submit</button>
+            </form>
+        </div>
+        
+
+    </div>
 {% endblock %}
