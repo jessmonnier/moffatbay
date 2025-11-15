@@ -1,4 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.contrib.auth.hashers import make_password
 
 # Create your views here.
 def index(request):
@@ -23,6 +26,41 @@ def login(request):
     return render(request, 'pages/login.html')
 
 def register(request):
+    if request.method == "POST":
+        first = request.POST.get("first_name")
+        last = request.POST.get("last_name")
+        email = request.POST.get("email")
+        phone = request.POST.get("phone_number")
+        password = request.POST.get("password")
+        confirm = request.POST.get("confirm_password")
+        agreed = request.POST.get("agreedToTerms")
+
+        # Validate terms checkbox
+        if not agreed:
+            messages.error(request, "You must agree to the Terms & Conditions.")
+            return redirect("register")
+
+        # Password match check
+        if password != confirm:
+            messages.error(request, "Passwords do not match.")
+            return redirect("register")
+
+        # Email must be unique (used as username)
+        if User.objects.filter(username=email).exists():
+            messages.error(request, "Email already exists.")
+            return redirect("register")
+
+        # Create user
+        user = User.objects.create(
+            username=email,     # ← Username stored as email
+            email=email,
+            first_name=first,
+            last_name=last,
+            password=make_password(password)
+        )
+
+        messages.success(request, "Account created! Please log in.")
+        return redirect("login")
     return render(request, 'pages/register.html')
 
 def reservation(request):

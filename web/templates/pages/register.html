@@ -23,7 +23,8 @@
         {#Registration Panel#}
         <div class = "registerPanel">
             <h3>Create Your Account</h3>
-            <form id = "registerForm" >
+            <form method = "POST"  id ="registerForm" action ="{% url 'register' %}">
+                    {% csrf_token %}
                 <label> First Name: </label>
                 <input type = "text" name = "first_name" placeholder = "Jane">
                 <br>
@@ -37,18 +38,18 @@
                 <input type = "text" name = "phone_number" placeholder = "123-456-7890">
                 <br>
                 <label> Password:</label>
-                <input type = "password" name = "password">
+                <input type = "password" name = "password" id="password">
                 <br>
                 <label> Confirm Password:</label>
-                <input type = "password" name = "confirm_password">
+                <input id="confirm" type="password" name="confirm_password">
                 <br>
                 
                 {#Password requirements#}
                 <div class = "passwordRequirments">
-                    <p> &#10008; Password must be at least 8 characters</p>
-                    <p> &#10008; Must include 1 Number</p>
-                    <p> &#10008; Must include 1 UPPERCASE Letter</p>
-                    <p> &#10008; Must include at least 1 lowercase letter</p>
+                    <p class = "requirement" id="lengthRequirement"><span class="icon bad">✗</span>  Password must be at least 8 characters</p>
+                    <p class = "requirement" id="numberRequirement"><span class="icon bad">✗</span> Must include 1 Number</p>
+                    <p class = "requirement" id="uppercaseRequirement"><span class="icon bad">✗</span> Must include 1 UPPERCASE Letter</p>
+                    <p class = "requirement" id="lowercaseRequirement"><span class="icon bad">✗</span> Must include at least 1 lowercase letter</p>
                 </div>
 
                 <div class = "terms">
@@ -58,6 +59,38 @@
                 <button id="submitButton">Submit</button>
             </form>
         </div>
+
+        <script>
+            //Check password requirements in real-time
+            const pwd = document.getElementById("password");
+            const confirmPwd = document.getElementById("confirm");
+
+            function updateReq(id, condition) {
+                const item = document.getElementById(id).querySelector(".icon");
+                if (condition) {
+                    item.textContent = "✓";
+                    item.classList.remove("bad");
+                    item.classList.add("good");
+                } else {
+                    item.textContent = "✗";
+                    item.classList.remove("good");
+                    item.classList.add("bad");
+                }
+            }
+
+            function validate() {
+                const value = pwd.value;
+
+                updateReq("lengthRequirement", value.length >= 8);
+                updateReq("uppercaseRequirement", /[A-Z]/.test(value));
+                updateReq("lowercaseRequirement", /[a-z]/.test(value));
+                updateReq("numberRequirement", /[0-9]/.test(value));
+                updateReq("match", value === confirmPwd.value);
+            }
+
+            pwd.addEventListener("input", validate);
+            confirmPwd.addEventListener("input", validate);
+        </script>
         
 
     </div>
