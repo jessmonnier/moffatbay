@@ -4,9 +4,15 @@
 
 {% block content %}
   <h2>Login</h2>
+   
+{% if request.GET.next %}
+    <p style="color: red; font-weight: bold;">
+        You are not logged in. You must be logged in to view account information.
+    </p>
+  {% endif %}
 
   {% if form.errors %}
-    <p style="color: red;">Please check your username and password.</p>
+    <p style="color: red;">Please check your email and password.</p>
   {% endif %}
 
   <form method="post">
