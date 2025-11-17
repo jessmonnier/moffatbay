@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -8,21 +9,10 @@ urlpatterns = [
     path('attractions/', views.attractions, name='attractions'),
     path('confirmation/', views.confirmation, name='confirmation'),
     path('contact/', views.contact, name='contact'),
-<<<<<<< Updated upstream
-    path('login/', views.login, name='login'),
-=======
     path('login/', auth_views.LoginView.as_view(template_name='pages/login.html'), name='login'),
-      path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+    path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
+    path('login/', auth_views.LoginView.as_view(template_name='pages/login.html'), name='login'),
+    path('logout/', views.logout_view, name='logout'),
     path('register/', views.register, name='register'),
     path('reservation/', views.reservation, name='reservation'),
     path('search/', views.search, name='search'),

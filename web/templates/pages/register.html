@@ -68,9 +68,14 @@
         </div>
 
         <script>
-            //Check password requirements in real-time
             const pwd = document.getElementById("password");
             const confirmPwd = document.getElementById("confirm");
+            const submitBtn = document.getElementById("submitButton");
+            const termsCheckbox = document.querySelector("input[name='agreedToTerms']");
+            const firstName = document.querySelector("input[name='first_name']");
+            const lastName = document.querySelector("input[name='last_name']");
+            const email = document.querySelector("input[name='email']");
+            const phone = document.querySelector("input[name='phone_number']");
 
             function updateReq(id, condition) {
                 const item = document.getElementById(id).querySelector(".icon");
@@ -88,15 +93,39 @@
             function validate() {
                 const value = pwd.value;
 
-                updateReq("lengthRequirement", value.length >= 8);
-                updateReq("uppercaseRequirement", /[A-Z]/.test(value));
-                updateReq("lowercaseRequirement", /[a-z]/.test(value));
-                updateReq("numberRequirement", /[0-9]/.test(value));
-                updateReq("match", value === confirmPwd.value);
+                const lengthValid = value.length >= 8;
+                const uppercaseValid = /[A-Z]/.test(value);
+                const lowercaseValid = /[a-z]/.test(value);
+                const numberValid = /[0-9]/.test(value);
+                const passwordsMatch = value === confirmPwd.value;
+
+                updateReq("lengthRequirement", lengthValid);
+                updateReq("uppercaseRequirement", uppercaseValid);
+                updateReq("lowercaseRequirement", lowercaseValid);
+                updateReq("numberRequirement", numberValid);
+
+                // Check that all fields are filled
+                const allFieldsFilled = firstName.value.trim() !== "" &&
+                                        lastName.value.trim() !== "" &&
+                                        email.value.trim() !== "" &&
+                                        phone.value.trim() !== "";
+
+                // Enable button only if everything is valid
+                if (lengthValid && uppercaseValid && lowercaseValid && numberValid && passwordsMatch && allFieldsFilled && termsCheckbox.checked) {
+                    submitBtn.disabled = false;
+                } else {
+                    submitBtn.disabled = true;
+                }
             }
 
-            pwd.addEventListener("input", validate);
-            confirmPwd.addEventListener("input", validate);
+            // Attach event listeners
+            [pwd, confirmPwd, firstName, lastName, email, phone, termsCheckbox].forEach(el => {
+                el.addEventListener("input", validate);
+                el.addEventListener("change", validate);
+            });
+
+            // Start with button disabled
+            submitBtn.disabled = true;
         </script>
         
 

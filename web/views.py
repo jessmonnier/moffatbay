@@ -1,7 +1,11 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login as auth_login
+from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def index(request):
@@ -10,6 +14,7 @@ def index(request):
 def about(request):
     return render(request, 'pages/about.html')
 
+@login_required(login_url='login')
 def account(request):
     return render(request, 'pages/account.html')
 
@@ -114,3 +119,7 @@ def reservation(request):
 
 def search(request):
     return render(request, 'pages/search.html')
+    
+def logout_view(request):
+    auth_logout(request)      # clears the session and logs the user out
+    return redirect('index')  # send them back to the home page
