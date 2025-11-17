@@ -19,6 +19,13 @@
                 both in the digital realm and the physical.
             </p>
         </div>
+            {% if messages %}
+                <script>
+                    {% for message in messages %}
+                        alert("{{ message|escapejs }}");
+                    {% endfor %}
+                </script>
+            {% endif %}
 
         {#Registration Panel#}
         <div class = "registerPanel">

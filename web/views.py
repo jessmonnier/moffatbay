@@ -44,6 +44,18 @@ def register(request):
         if password != confirm:
             messages.error(request, "Passwords do not match.")
             return redirect("register")
+<<<<<<< Updated upstream
+=======
+        
+        #Empty field check
+        if not all([first, last, email, phone, password, confirm]):
+            messages.error(request, "All fields are required.")
+            return redirect("register")
+        #Empty password check
+        if not password:
+            messages.error(request, "Password cannot be empty.")
+            return redirect("register")
+>>>>>>> Stashed changes
 
         # Email must be unique (used as username)
         if User.objects.filter(username=email).exists():
@@ -60,7 +72,11 @@ def register(request):
         )
 
         messages.success(request, "Account created! Please log in.")
+<<<<<<< Updated upstream
         return redirect("login")
+=======
+        return redirect("index")
+>>>>>>> Stashed changes
     return render(request, 'pages/register.html')
 
 def reservation(request):
