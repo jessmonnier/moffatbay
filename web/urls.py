@@ -15,6 +15,9 @@ urlpatterns = [
       path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
