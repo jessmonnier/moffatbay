@@ -48,6 +48,7 @@ def register(request):
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 =======
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
