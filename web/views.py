@@ -2,6 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def index(request):
@@ -9,8 +13,6 @@ def index(request):
 
 def about(request):
     return render(request, 'pages/about.html')
-
-from django.contrib.auth.decorators import login_required
 
 @login_required(login_url='login')
 def account(request):
@@ -25,23 +27,46 @@ def confirmation(request):
 def contact(request):
     return render(request, 'pages/contact.html')
 
-#def login(request):
-#    return render(request, 'pages/login.html')
+def login(request):
+    return render(request, 'pages/login.html')
 
 def register(request):
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            # Create the user
-            user = form.save()
-            # Log them in immediately after registration
-            auth_login(request, user)
-            # Send them to the account or home page
-            return redirect("account")
-    else:
-        form = UserCreationForm()
+        first = request.POST.get("first_name")
+        last = request.POST.get("last_name")
+        email = request.POST.get("email")
+        phone = request.POST.get("phone_number")
+        password = request.POST.get("password")
+        confirm = request.POST.get("confirm_password")
+        agreed = request.POST.get("agreedToTerms")
 
-    return render(request, "pages/register.html", {"form": form})
+        # Validate terms checkbox
+        if not agreed:
+            messages.error(request, "You must agree to the Terms & Conditions.")
+            return redirect("register")
+
+        # Password match check
+        if password != confirm:
+            messages.error(request, "Passwords do not match.")
+            return redirect("register")
+
+        # Email must be unique (used as username)
+        if User.objects.filter(username=email).exists():
+            messages.error(request, "Email already exists.")
+            return redirect("register")
+
+        # Create user
+        user = User.objects.create(
+            username=email,     # ← Username stored as email
+            email=email,
+            first_name=first,
+            last_name=last,
+            password=make_password(password)
+        )
+
+        messages.success(request, "Account created! Please log in.")
+        return redirect("login")
+    return render(request, 'pages/register.html')
 
 def reservation(request):
     return render(request, 'pages/reservation.html')

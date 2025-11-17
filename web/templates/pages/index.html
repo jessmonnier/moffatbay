@@ -1,26 +1,9 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Moffat Bay Hotel</title>
-  <link rel="stylesheet" href="css/styles.css" />
-</head>
-<body>
-  <header class="site-header">
-    <div class="container">
-      <h1 class="logo">Moffat Bay</h1>
-      <nav>
-        <a href="#rooms">Rooms</a>
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
-        <a href="login">Login</a>
-        <a href="register">Register</a>
-      </nav>
-    </div>
-  </header>
+{% extends 'pages/base.html' %}
+{% load static %}
 
-  <main>
+{% block title %}Home | Moffat Bay Lodge{% endblock %}
+
+{% block content %}
     <section class="hero">
       <div class="hero-inner container">
         <div class="hero-text">
@@ -28,7 +11,7 @@
           <p>Comfort, ocean views, and warm hospitality — book your stay today.</p>
           <a class="btn" href="#booking">Book Now</a>
         </div>
-        <img src="images/whale.png" alt="Whale illustration" class="hero-img" />
+        <img src="{% static 'web/images/whale.png' %}" alt="Whale leaping from the ocean" class="hero-img" />
       </div>
     </section>
 
@@ -46,14 +29,4 @@
       <h3>Contact</h3>
       <p>Email: info@example.com • Phone: (555) 555-5555</p>
     </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="container">© <span id="year"></span> Moffat Bay Hotel</div>
-  </footer>
-
-  <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
-</body>
-</html>
+{% endblock %}

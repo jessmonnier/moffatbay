@@ -160,7 +160,7 @@ VALUES
 ('King', 160.00, 1, 2, 'Large king room with premium amenities.');
 
 -- Now rooms, two of each type for now
-INSERT INTO rooms (room_number, room_type, status)
+INSERT INTO rooms (room_number, room_type_id, status)
 VALUES
 ('101', 1, 'Available'),
 ('102', 1, 'Cleaning'),
