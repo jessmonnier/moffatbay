@@ -46,7 +46,9 @@ def register(request):
             return redirect("register")
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
         
@@ -59,6 +61,9 @@ def register(request):
             messages.error(request, "Password cannot be empty.")
             return redirect("register")
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -80,7 +85,11 @@ def register(request):
         messages.success(request, "Account created! Please log in.")
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         return redirect("login")
+=======
+        return redirect("index")
+>>>>>>> Stashed changes
 =======
         return redirect("index")
 >>>>>>> Stashed changes
