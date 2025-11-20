@@ -1,7 +1,36 @@
 {% extends 'pages/base.html' %}
 
-{% block title %}Home | Moffat Bay Lodge{% endblock %}
+{% block title %}Reservation Summary | Moffat Bay Lodge{% endblock %}
 
 {% block content %}
-    <h2>Placeholder - Confirmation</h2>
+  <h2>Reservation Summary</h2>
+
+  <p>Thank you, {{ first_name }} {{ last_name }}. Please review your reservation details below:</p>
+
+  <h3>Guest Information</h3>
+  <ul>
+      <li><strong>Name:</strong> {{ first_name }} {{ last_name }}</li>
+      <li><strong>Email:</strong> {{ email }}</li>
+      <li><strong>Phone:</strong> {{ phone }}</li>
+  </ul>
+
+  <h3>Stay Details</h3>
+  <ul>
+      <li><strong>Check-in:</strong> {{ check_in }}</li>
+      <li><strong>Check-out:</strong> {{ check_out }}</li>
+      <li><strong>Number of Guests:</strong> {{ guests }}</li>
+      <li><strong>Room Type:</strong> {{ room_type }}</li>
+  </ul>
+
+  {% if special_requests %}
+  <h3>Special Requests</h3>
+  <p>{{ special_requests }}</p>
+  {% endif %}
+
+  <form method="post" action="{% url 'reservation' %}">
+      {% csrf_token %}
+      <button type="submit">Make Changes</button>
+  </form>
+
+  <p>If everything looks correct, your next step could be to finalize this reservation (for now this can just be a text note if you don’t have a payment step yet).</p>
 {% endblock %}
