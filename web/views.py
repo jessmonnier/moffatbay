@@ -22,7 +22,24 @@ def attractions(request):
     return render(request, 'pages/attractions.html')
 
 def confirmation(request):
-    return render(request, 'pages/confirmation.html')
+    if request.method != "POST":
+        # If someone types /confirmation/ directly, send them back to the form
+        return redirect("reservation")
+
+    # Pull data from the reservation form
+    context = {
+        "first_name": request.POST.get("first_name", ""),
+        "last_name": request.POST.get("last_name", ""),
+        "email": request.POST.get("email", ""),
+        "phone": request.POST.get("phone_number", ""),
+        "check_in": request.POST.get("check_in_date", ""),
+        "check_out": request.POST.get("check_out_date", ""),
+        "guests": request.POST.get("num_guests", ""),
+        "room_type": request.POST.get("room_type", ""),
+        "special_requests": request.POST.get("special_requests", ""),
+    }
+
+    return render(request, "pages/confirmation.html", context))
 
 def contact(request):
     return render(request, 'pages/contact.html')
