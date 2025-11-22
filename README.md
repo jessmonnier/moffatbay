@@ -62,8 +62,9 @@ Pages, models, operations, and/or functionality:
   - Simple marketing landing page (use the Internet for inspiration on landing pages).
 - About Us page:
   - Static HTML/CSS content related to Moffat Bay Lodge.
-- Contact Us page:
-  - Static HTML/CSS content related to the Moffat Bay Lodge.
+  - Include the contact information on the about page
+- ~~Contact Us page:~~
+  - ~~Static HTML/CSS content related to the Moffat Bay Lodge.~~
 - Attractions page:
   - Static HTML/CSS content related to activites available on the island. Hiking, kayaking, whale watching, and scuba diving should be included.
 - Registration page:
@@ -80,7 +81,8 @@ Pages, models, operations, and/or functionality:
   - Note: You are building a lodge reservation page that allows customers to “book their vacation.” MySQL must be used to save the data.
   - Form selection options: room size, number of guests, and check-in/check-out dates.
   - Additional comments:
-    - Room size: double full beds = 120.00 per night, queen = 135.00 per night, double queen beds = 150.00 per night, and king = 160.00 per night.
+    - ~~Room size: double full beds = 120.00 per night, queen = 135.00 per night, double queen beds = 150.00 per night, and king = 160.00 per night.~~ Updated with customer request for 5% room rate increase:
+    - Room size: double full beds = 126.00 per night, queen = 141.75 per night, double queen beds = 157.50 per night, and king = 168.00 per night.
 - Reservation summary page:
   - Note: Provide customers with a reservation confirmation summary and a button to either cancel or submit the reservation. Submitted reservation must be saved to MySQL. Canceling the reservation should take users back to the hotel reservation page.
 - Reservation look up page:
