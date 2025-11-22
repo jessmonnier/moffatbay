@@ -20,6 +20,7 @@ class Customer(models.Model):
 
 
 class RoomType(models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=25)
     price_per_night = models.DecimalField(max_digits=7, decimal_places=2)
     beds = models.IntegerField()
@@ -28,6 +29,7 @@ class RoomType(models.Model):
 
     class Meta:
         db_table = 'room_types'
+        managed = False
     
     def __str__(self):
         return f"{self.name} - ${self.price_per_night}/night"
