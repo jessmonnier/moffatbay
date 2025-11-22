@@ -1,7 +1,101 @@
 {% extends 'pages/base.html' %}
-
+{% load static %}
 {% block title %}Home | Moffat Bay Lodge{% endblock %}
 
 {% block content %}
-    <h2>Placeholder - About</h2>
+    <div class = "aboutUsContent">
+        <div class = "aboutUsTopPanel">
+            <h2>About Us</h2>
+            <p>Moffat Bay, a place of adventure and relaxation for everyone.
+                 It's a great new place to enjoy the beauty of the Pacific Northwest.</p>
+            <img>
+        </div><!--End of top panel-->
+
+        <div class = "centerContent">
+            <div id= "aboutCenterText">
+                <h3>Moffat Bay Lodge</h3>
+                <ul>
+                    <li>Newly built eco-friendly resort</li>
+                    <li> Cabin Style Accommodations overlooking the bay</li>
+                    <li> Farm to table resturnant that features locally sourced ingredients</li>
+                    <li> Full service spa and wellness center</li>
+                    <li> Outdoor activities including hiking, kayaking, and fishing</li>
+                    <li> Tours guided by local experts to explore the natural beauty of the area</li>
+                </ul>
+            </div><!--End of aboutCenterText-->
+
+            <div class = "slideShowContainer">
+                <!--SlideButton-->
+                <a class = "previousButton" onclick="plusSlides(-1)"><img src="{% static 'web/images/previousIcon.png' %}" alt="Previous"
+                    Style="width:50px; height:auto;"> </a>
+                
+                <div class= "slide">
+                    <img class="slideImage" 
+                        src="{% static 'web/images/lakeOverViewImage.jpg' %}" alt="Lake view"
+                        Style="width:500px; height:auto;">
+                    <caption id = "slideCaption"> Secenic overview of one of our many hike trails</caption>
+                </div>
+
+                <div class= "slide">
+                    <img class="slideImage" 
+                        src="{% static 'web/images/hikeTrail.jpg' %}" alt="Trail view"
+                        Style="width:500px; height:auto;">
+                    <caption class = "slideCaption"> Relaxing quiet hiking trail</caption>
+                </div>
+
+                <div class= "slide">
+                    <img class="slideImage" 
+                        src="{% static 'web/images/kayaking.jpg' %}" alt="kayaking view"
+                        Style="width:500px; height:auto;">
+                    <caption class = "slideCaption"> Guided kayaking tours on the bay</caption>
+                </div>
+
+                <div class= "slide">
+                    <img class="slideImage" 
+                        src="{% static 'web/images/lodgePorch.jpg' %}" alt="Porch view"
+                        Style="width:500px; height:auto;">
+                    <caption class = "slideCaption">Large wrap around porch perfect for sitting under the stars</caption>
+                </div>
+                <!--Slide buttons-->
+
+                <a class = "nextButton" onclick="plusSlides(1)"><img src="{% static 'web/images/nextIcon.png' %}" alt="Next"
+                    Style="width:50px; height:auto;"> </a>
+            </div><!--End of slideShowContainer-->
+        </div><!--End of Center content-->
+         <a href="{% url 'login' %}" id="bookNowButton">Book Now</a> 
+
+        <!--JavaScript for Slide Show-->
+        <script>
+            let slideIndex = 1;
+            showSlides(slideIndex);
+
+            //Button Controls
+            function plusSlides(n){
+                showSlides(slideIndex += n);
+            }
+
+            function currentSlide(n){
+                showSlides(slideIndex = n);
+            }
+
+            function showSlides(n){
+                let i;
+                let slides = document.getElementsByClassName("slide");
+
+                if (n > slides.length) { slideIndex = 1 }
+                if (n < 1) { slideIndex = slides.length }
+
+                for (i = 0; i < slides.length; i++) {
+                    slides[i].style.display = "none";
+                }
+
+                slides[slideIndex - 1].style.display = "block";
+            }
+        </script>
+    </div><!--End of About Us content-->
+
+
+
+    <!--Slide Show Section by W3Schools-->
+    <!--Icons by: Ilham Fitrotul Hayat-->
 {% endblock %}
