@@ -298,3 +298,55 @@ footer {
 #bookNowButton:hover {
     background-color: #45a049;
 }
+
+.emptySpace{
+    height: 150px;
+    width: 100%;
+}
+
+/*Contact Section*/
+.contactUsContainer{
+    display: flex;
+    margin-bottom: 90px;
+}
+
+.contactForm{
+    background-color: white;
+    width: auto;
+    margin: auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.contactForm h3{
+    text-align: center;
+}
+
+.contactForm label {
+    display: inline-block;
+    text-align: right;
+}
+
+
+.contactForm textarea {
+    display: inline-block;
+    width: 300px;
+    margin-bottom: 10px;
+    padding: 10px;
+    height: 25px;
+    border-width: 1px;
+    border-radius: 5px;
+}
+
+.contactForm input {
+    display: inline-block;
+    width: 300px;
+    margin-bottom: 10px;
+    padding: 5px;
+    height: 25px;
+    border-width: 1px;
+    border-radius: 5px;
+}
+
+
