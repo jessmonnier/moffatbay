@@ -68,9 +68,14 @@
         </div>
 
         <script>
-            //Check password requirements in real-time
             const pwd = document.getElementById("password");
             const confirmPwd = document.getElementById("confirm");
+            const submitBtn = document.getElementById("submitButton");
+            const termsCheckbox = document.querySelector("input[name='agreedToTerms']");
+            const firstName = document.querySelector("input[name='first_name']");
+            const lastName = document.querySelector("input[name='last_name']");
+            const email = document.querySelector("input[name='email']");
+            const phone = document.querySelector("input[name='phone_number']");
 
             function updateReq(id, condition) {
                 const item = document.getElementById(id).querySelector(".icon");
@@ -87,16 +92,42 @@
 
             function validate() {
                 const value = pwd.value;
+                const lengthValid = value.length >= 8;
+                const uppercaseValid = /[A-Z]/.test(value);
+                const lowercaseValid = /[a-z]/.test(value);
+                const numberValid = /[0-9]/.test(value);
+                const passwordsMatch = value === confirmPwd.value && value.length > 0;
 
-                updateReq("lengthRequirement", value.length >= 8);
-                updateReq("uppercaseRequirement", /[A-Z]/.test(value));
-                updateReq("lowercaseRequirement", /[a-z]/.test(value));
-                updateReq("numberRequirement", /[0-9]/.test(value));
-                updateReq("match", value === confirmPwd.value);
+                // Update visual password requirement indicators
+                updateReq("lengthRequirement", lengthValid);
+                updateReq("uppercaseRequirement", uppercaseValid);
+                updateReq("lowercaseRequirement", lowercaseValid);
+                updateReq("numberRequirement", numberValid);
+
+                // Optional: add a match requirement indicator if you have one
+                if (document.getElementById("match")) {
+                    updateReq("match", passwordsMatch);
+                }
+
+                // Check that all other fields are filled
+                const allFieldsFilled = firstName.value.trim() !== "" &&
+                                        lastName.value.trim() !== "" &&
+                                        email.value.trim() !== "" &&
+                                        phone.value.trim() !== "";
+
+                // Enable submit button only if everything is valid and terms checked
+                submitBtn.disabled = !(lengthValid && uppercaseValid && lowercaseValid && numberValid &&
+                                    passwordsMatch && allFieldsFilled && termsCheckbox.checked);
             }
 
-            pwd.addEventListener("input", validate);
-            confirmPwd.addEventListener("input", validate);
+            // Attach event listeners to inputs and checkbox
+            [pwd, confirmPwd, firstName, lastName, email, phone].forEach(el => {
+                el.addEventListener("input", validate);
+            });
+            termsCheckbox.addEventListener("change", validate);
+
+            // Start with button disabled
+            submitBtn.disabled = true;
         </script>
         
 

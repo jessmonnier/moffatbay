@@ -1,7 +1,32 @@
 {% extends 'pages/base.html' %}
+{% load static %}
 
 {% block title %}Home | Moffat Bay Lodge{% endblock %}
 
 {% block content %}
-    <h2>Welcome to Moffat Bay Lodge</h2>
+    <section class="hero">
+      <div class="hero-inner container">
+        <div class="hero-text">
+          <h2>Welcome to Moffat Bay</h2>
+          <p>Comfort, ocean views, and warm hospitality — book your stay today.</p>
+          <a class="btn" href="#booking">Book Now</a>
+        </div>
+        <img src="{% static 'web/images/whale.png' %}" alt="Whale leaping from the ocean" class="hero-img" />
+      </div>
+    </section>
+
+    <section id="rooms" class="container">
+      <h3>Rooms & Suites</h3>
+      <p>Short descriptions of accommodations, amenities, and pricing.</p>
+    </section>
+
+    <section id="about" class="container">
+      <h3>About Us</h3>
+      <p>One paragraph telling the hotel story or mission.</p>
+    </section>
+
+    <section id="contact" class="container">
+      <h3>Contact</h3>
+      <p>Email: info@example.com • Phone: (555) 555-5555</p>
+    </section>
 {% endblock %}

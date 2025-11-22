@@ -1,7 +1,11 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login as auth_login
+from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def index(request):
@@ -10,6 +14,7 @@ def index(request):
 def about(request):
     return render(request, 'pages/about.html')
 
+@login_required(login_url='login')
 def account(request):
     return render(request, 'pages/account.html')
 
@@ -44,6 +49,7 @@ def register(request):
         if password != confirm:
             messages.error(request, "Passwords do not match.")
             return redirect("register")
+        
         #Empty field check
         if not all([first, last, email, phone, password, confirm]):
             messages.error(request, "All fields are required.")
@@ -68,14 +74,16 @@ def register(request):
         )
 
         messages.success(request, "Account created! Please log in.")
-
         return redirect("login")
-
-        return redirect("index")
-    return render(request, 'pages/register.html')
+    return render(request, "pages/register.html")
 
 def reservation(request):
     return render(request, 'pages/reservation.html')
 
 def search(request):
     return render(request, 'pages/search.html')
+    
+def logout_view(request):
+    if request.method == "POST":
+        auth_logout(request)
+    return redirect('index')
