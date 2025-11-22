@@ -243,3 +243,27 @@ def logout_view(request):
     if request.method == "POST":
         auth_logout(request)
     return redirect('index')
+
+from .models import Reservation
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def save_reservation(request):
+    if request.method != "POST":
+        return redirect("reservation")
+
+    Reservation.objects.create(
+        user=request.user,
+        first_name=request.POST.get("first_name"),
+        last_name=request.POST.get("last_name"),
+        email=request.POST.get("email"),
+        phone=request.POST.get("phone"),
+        check_in=request.POST.get("check_in"),
+        check_out=request.POST.get("check_out"),
+        guests=request.POST.get("guests"),
+        room_type=request.POST.get("room_type"),
+        special_requests=request.POST.get("special_requests"),
+        is_draft=True,     # ✔ OPTION FOR LATER COMPLETION
+    )
+
+    return render(request, "pages/save_success.html")
