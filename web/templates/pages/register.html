@@ -1,4 +1,11 @@
-<!--Navigation extention of base.html -->
+{#
+CSD-460 Capstone Blue Team
+Moffat Bay Lodge Project
+Vee Bell, Deja Faison, Julia Gonzalez, Jess Monnier
+Professor Sue Sampson
+Developed October thru December of 2025
+#}
+
 {% extends 'pages/base.html' %}
 
 {% block title %}Home | Moffat Bay Lodge{% endblock %}
@@ -6,7 +13,7 @@
 {% block content %}
     <div class = "registerContainer">
         
-        {#Registration information#}
+        {# Registration information #}
         <div class = "registerHeader">
             <h2>Register for an Account</h2>
             <p>To better protect your private data and ensure ease of finding, modifying, 
@@ -27,7 +34,7 @@
                 </script>
             {% endif %}
 
-        {#Registration Panel#}
+        {# Registration Panel #}
         <div class = "registerPanel">
             <h3>Create Your Account</h3>
             <form method = "POST"  id ="registerForm" action ="{% url 'register' %}">
@@ -51,7 +58,7 @@
                 <input id="confirm" type="password" name="confirm_password">
                 <br>
                 
-                {#Password requirements#}
+                {# Password requirements #}
                 <div class = "passwordRequirments">
                     <p class = "requirement" id="lengthRequirement"><span class="icon bad">✗</span>  Password must be at least 8 characters</p>
                     <p class = "requirement" id="numberRequirement"><span class="icon bad">✗</span> Must include 1 Number</p>

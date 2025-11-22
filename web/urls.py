@@ -1,3 +1,11 @@
+"""
+CSD-460 Capstone Blue Team
+Moffat Bay Lodge Project
+Vee Bell, Deja Faison, Julia Gonzalez, Jess Monnier
+Professor Sue Sampson
+Developed October thru December of 2025
+"""
+
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
