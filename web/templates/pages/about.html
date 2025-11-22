@@ -71,6 +71,29 @@ Developed October thru December of 2025
             </div><!--End of slideShowContainer-->
         </div><!--End of Center content-->
          <a href="{% url 'login' %}" id="bookNowButton">Book Now</a> 
+        <br>
+
+        <!--Spacing-->
+        <div class = "emptySpace">
+        </div>
+
+        <!--Contact Us -->
+        <div class = "contactUsContainer">
+            <Form class = "contactForm">
+                <h2>Share your thoughts!</h2>
+                <p>Please fill out the form below to get in touch:</p><br>
+                <label for="firstName">First Name:</label><br>
+                <input type="text" id="firstName" name="firstName" required placeholder="First Name"><br>
+                <label for="lastName">Last Name:</label><br>
+                <input type="text" id="lastName" name="lastName" required placeholder="Last Name"><br>
+                <label for="email">Email:</label><br>
+                <input type="email" id="email" name="email" required placeholder="Email Address"><br>
+                <label for="message">Message:</label><br>
+                <textarea id="message" name="message" rows="4" cols="50" required placeholder="Your message here..."></textarea><br>
+                <input type="submit" class="submitButton" id="submitButton" value="Send Message" style = "width: 150px;">
+            </form>
+        </div>
+        <!--Contact Us Form-->
 
         <!--JavaScript for Slide Show-->
         <script>
@@ -101,8 +124,6 @@ Developed October thru December of 2025
             }
         </script>
     </div><!--End of About Us content-->
-
-
 
     <!--Slide Show Section by W3Schools-->
     <!--Icons by: Ilham Fitrotul Hayat-->
