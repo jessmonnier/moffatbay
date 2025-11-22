@@ -3,34 +3,94 @@
 {% block title %}Reservation Summary | Moffat Bay Lodge{% endblock %}
 
 {% block content %}
-  <h2>Reservation Summary</h2>
+<div style="max-width: 700px; margin: 0 auto; padding: 20px; border: 1px solid #ccc;
+            border-radius: 8px; background-color: #fafafa;">
 
+  {# Invalid email warnings #}
+  {% if invalid_emails %}
+    <div style="border: 1px solid #b00020; background-color: #ffe5e8;
+                padding: 10px 15px; margin-bottom: 20px; color: #7a0014;">
+      <strong>The following email address(es) were not valid and did not receive a confirmation:</strong>
+      <ul style="margin: 5px 0 0 18px;">
+        {% for e in invalid_emails %}
+          <li>{{ e }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <h2 style="margin-top: 0;">Reservation Summary</h2>
   <p>Thank you, {{ first_name }} {{ last_name }}. Please review your reservation details below:</p>
 
-  <h3>Guest Information</h3>
-  <ul>
+  <hr />
+
+  <section style="margin-bottom: 16px;">
+    <h3 style="margin-bottom: 4px;">Reservation Number</h3>
+    <p><strong>{{ reservation_number }}</strong></p>
+  </section>
+
+  <section style="margin-bottom: 16px;">
+    <h3 style="margin-bottom: 4px;">Guest Information</h3>
+    <ul style="list-style: none; padding-left: 0;">
       <li><strong>Name:</strong> {{ first_name }} {{ last_name }}</li>
       <li><strong>Email:</strong> {{ email }}</li>
       <li><strong>Phone:</strong> {{ phone }}</li>
-  </ul>
+    </ul>
+  </section>
 
-  <h3>Stay Details</h3>
-  <ul>
+  <section style="margin-bottom: 16px;">
+    <h3 style="margin-bottom: 4px;">Stay Details</h3>
+    <ul style="list-style: none; padding-left: 0;">
       <li><strong>Check-in:</strong> {{ check_in }}</li>
       <li><strong>Check-out:</strong> {{ check_out }}</li>
       <li><strong>Number of Guests:</strong> {{ guests }}</li>
       <li><strong>Room Type:</strong> {{ room_type }}</li>
-  </ul>
+    </ul>
+  </section>
+
+  <section style="margin-bottom: 16px;">
+    <h3 style="margin-bottom: 4px;">Pricing Details</h3>
+
+    {% if price_per_night is not None %}
+      <ul style="list-style: none; padding-left: 0;">
+        <li><strong>Price per night:</strong> ${{ price_per_night|floatformat:2 }}</li>
+        {% if nights %}
+          <li><strong>Nights:</strong> {{ nights }}</li>
+        {% endif %}
+        {% if total_cost %}
+          <li style="margin-top: 6px;">
+            <strong>Total Cost:</strong>
+            <span style="font-size: 1.1rem;">${{ total_cost|floatformat:2 }}</span>
+          </li>
+        {% endif %}
+      </ul>
+    {% else %}
+      <p style="color: red;">Rate information not found for this room type.</p>
+    {% endif %}
+  </section>
 
   {% if special_requests %}
-  <h3>Special Requests</h3>
-  <p>{{ special_requests }}</p>
+    <section style="margin-bottom: 16px;">
+      <h3 style="margin-bottom: 4px;">Special Requests</h3>
+      <p style="white-space: pre-line;">{{ special_requests }}</p>
+    </section>
   {% endif %}
 
-  <form method="post" action="{% url 'reservation' %}">
-      {% csrf_token %}
-      <button type="submit">Make Changes</button>
-  </form>
+  <hr />
 
-  <p>If everything looks correct, your next step could be to finalize this reservation (for now this can just be a text note if you don’t have a payment step yet).</p>
+  <div style="display: flex; gap: 10px; margin-top: 10px;">
+    <form method="get" action="{% url 'reservation' %}">
+      <button type="submit">Edit / Update Reservation</button>
+    </form>
+
+    <a href="{% url 'index' %}" style="align-self: center; text-decoration: none;">
+      Back to Home
+    </a>
+  </div>
+
+  <p style="margin-top: 15px; font-size: 0.9rem; color: #555;">
+    If everything looks correct, your reservation has been recorded. You should
+    also receive a confirmation email at the address(es) you provided.
+  </p>
+</div>
 {% endblock %}
