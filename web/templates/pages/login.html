@@ -1,12 +1,21 @@
+<!--
+CSD-460 Capstone Blue Team
+Moffat Bay Lodge Project
+Vee Bell, Deja Faison, Julia Gonzalez, Jess Monnier
+Professor Sue Sampson
+Developed October thru December of 2025
+-->
+
 {% extends 'pages/base.html' %}
 
 {% block title %}Login | Moffat Bay Lodge{% endblock %}
 
 {% block content %}
+<div class="registerPanel">
   <h2>Login</h2>
 
   {% if request.GET.next %}
-    <p style="color: red; font-weight: bold;">
+    <p class="error-message">
         You are not logged in. You must log in to access that page.
     </p>
   {% endif %}
@@ -38,12 +47,13 @@
   </button>
 </p>
 
-  <button type="submit">Login</button>
+  <button class="submitButton" type="submit">Login</button>
 </form>
 
   <p>Don't have an account yet?
     <a href="{% url 'register' %}">Register here</a>.
   </p>
+</div>
 
 <script>
 document.getElementById("togglePassword").addEventListener("click", function () {

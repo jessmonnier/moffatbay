@@ -1,4 +1,12 @@
-/*Styling*/
+/*
+CSD-460 Capstone Blue Team
+Moffat Bay Lodge Project
+Vee Bell, Deja Faison, Julia Gonzalez, Jess Monnier
+Professor Sue Sampson
+Developed October thru December of 2025
+*/
+
+/* Styling */
 html {
     /* Ensures html element takes up full height of the browser window */
     height: 100%;
@@ -76,6 +84,26 @@ header nav ul li a.active {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
+.error-message {
+    color: red;
+    background-color: #ffe6e6;
+    border: 1px solid red;
+    padding: 8px 12px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+.success-message {
+    color: green;
+    background-color: #e6ffe6;
+    border: 1px solid green;
+    padding: 8px 12px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
 .logout-button {
     background: none;       /* remove background */
     border: none;           /* remove border */
@@ -115,8 +143,8 @@ footer {
     z-index: 1000;     /* Ensure it sits above other content */
 }
 
-/*Register page*/
-.registerPanel{
+/* Register page */
+.registerPanel {
     background-color: white;
     width: 450px;
     margin: auto;
@@ -125,7 +153,7 @@ footer {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
-.registerPanel h3{
+.registerPanel h3 {
     text-align: center;
 }
 
@@ -168,19 +196,20 @@ footer {
     margin-left: 5px;
 }
 
-#submitButton {
+.submitButton {
     display: block;
     margin: auto;
-    width: 100px;
+    width: 200px;
     height: 30px;
     border-radius: 15px;
     color: white;
     font-weight: bold;
+    font-size: 20px;
     border: none;
     cursor: pointer;
 }
 
-#submitButton:disabled {
+.submitButton:disabled {
     background-color: #aaa;  /* greyed out */
     color: #666;             /* darker text */
     cursor: not-allowed;     /* shows the "no" cursor */
@@ -188,7 +217,7 @@ footer {
     pointer-events: none;    /* optional, prevents accidental clicks */
 }
 
-#submitButton {
+.submitButton {
     background-color: #4CAF50;
     color: white;
     border: none;
@@ -198,7 +227,7 @@ footer {
     transition: all 0.2s ease;
 }
 
-#submitButton:not(:disabled):hover {
+.submitButton:not(:disabled):hover {
     background-color: #6de771;
 }
 
@@ -217,7 +246,7 @@ footer {
   .hero-img{max-width:70%}
 }
 
-/*About Section*/
+/* About Section */
 .centerContent {
     display: flex;
     align-items: flex-start;   /* aligns the top of the text and slideshow */
@@ -313,6 +342,27 @@ footer {
 .contactForm{
     background-color: white;
     width: auto;
+/* Reservation-specific styling */
+.reservationForm label {
+    display: inline-block;
+    width: 150px;
+    text-align: right;
+    padding-right: 15px;
+}
+.reservationForm input, .reservationForm select {
+    display: inline-block;
+    width: 220px;
+    margin-bottom: 10px;
+    padding: 5px;
+    height: 35px;
+    border-width: 1px;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.reservationPanel {
+    background-color: white;
+    width: 450px;
     margin: auto;
     padding: 20px;
     border-radius: 10px;
@@ -350,3 +400,80 @@ footer {
 }
 
 
+.reservationPanel h3{
+    text-align: center;
+}
+
+/* Common button styles */
+.reservation-button {
+    display: inline-block;          /* allow them to sit side by side */
+    width: 180px;
+    height: 40px;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-right: 10px;             /* space between buttons */
+    text-align: center;
+}
+
+/* Reserve (green) button */
+.reserve-button {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.reserve-button:hover {
+    background-color: #6de771;
+}
+
+/* Hold (neutral) button */
+.hold-button {
+    background-color: #888;         /* greyish neutral */
+    color: white;
+}
+
+.hold-button:hover {
+    background-color: #aaa;         /* slightly lighter on hover */
+}
+
+/* Disabled state (shared) */
+.reservation-button:disabled {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.form-buttons {
+    text-align: center;
+}
+
+/* Table styling */
+table.reservation-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+table.reservation-table th,
+table.reservation-table td {
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    text-align: center;
+}
+
+table.reservation-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+table.reservation-table tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+table.reservation-table tr:hover {
+    background-color: #f1f7ff;
+}
