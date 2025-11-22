@@ -133,3 +133,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "account"   # or "index" if you prefer
 LOGOUT_REDIRECT_URL = "index"
+
+# For development: print emails to the terminal
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "reservations@moffatbaylodge.com"
