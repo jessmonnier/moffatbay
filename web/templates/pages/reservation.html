@@ -1,15 +1,160 @@
-{#
+<!--
 CSD-460 Capstone Blue Team
 Moffat Bay Lodge Project
 Vee Bell, Deja Faison, Julia Gonzalez, Jess Monnier
 Professor Sue Sampson
 Developed October thru December of 2025
-#}
+-->
 
 {% extends 'pages/base.html' %}
 
 {% block title %}Home | Moffat Bay Lodge{% endblock %}
 
 {% block content %}
-    <h2>Placeholder - Reservation</h2>
+<div class="reservationPanel">
+<h2>Make a Reservation</h2>
+
+<form method="get" action="{% url 'reservation' %}" class="reservation-search-form">
+    <div class="reservationForm">
+        <label for="check_in">Check-in Date:</label>
+        <input type="date" id="check_in" name="check_in" value="{{ initial_data.check_in }}">
+        <label for="check_out">Check-out Date:</label>
+        <input type="date" id="check_out" name="check_out" value="{{ initial_data.check_out }}">
+        <label for="guests">Number of Guests:</label>
+        <input type="number" id="guests" name="guests" min="1" value="{{ initial_data.guests }}">
+        <label for="room_type">Room Type:</label>
+        <select id="room_type" name="room_type">
+            <option value="">-- Any Room Type --</option>
+            {% for rt in room_types %}
+                <option value="{{ rt.id }}" {% if initial_data.room_type == rt.id|stringformat:"s" %}selected{% endif %}>
+                    {{ rt.name }} (Max {{ rt.max_guests }} guests)
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <center>
+    <button class="reservation-button reserve-button" id="checkButton" type="submit">Check Availability</button>
+    </center>
+</form>
+
+{% if available_room_types %}
+    <h3>Available Room Types</h3>
+    <form method="post" action="{% url 'save_reservation' %}">
+        {% csrf_token %}
+        <!-- Hidden inputs for the reservation -->
+        <input type="hidden" name="check_in" value="{{ initial_data.check_in }}">
+        <input type="hidden" name="check_out" value="{{ initial_data.check_out }}">
+
+        <table class="reservation-table">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Room Type</th>
+                    <th>Price per Night</th>
+                    <th>Max Guests</th>
+                    <th>Available Rooms</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in available_room_types %}
+                <tr>
+                    <td>
+                        <input type="radio" name="room_type" value="{{ entry.room_type.id }}" required>
+                    </td>
+                    <td>{{ entry.room_type.name }}</td>
+                    <td>${{ entry.room_type.price_per_night }}</td>
+                    <td>{{ entry.room_type.max_guests }}</td>
+                    <td>{{ entry.available_count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h3>Guest Information</h3>
+        <div class="reservationForm">
+            <label for="first_name">First Name:</label>
+            <input type="text" id="first_name" name="first_name" required
+                value="{{ initial_data.first_name|default:'' }}">
+            <label for="last_name">Last Name:</label>
+            <input type="text" id="last_name" name="last_name" required
+                value="{{ initial_data.last_name|default:'' }}">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required
+                value="{{ initial_data.email|default:'' }}">
+            <label for="phone">Phone Number:</label>
+            <input type="tel" id="phone" name="phone" required
+                value="{{ initial_data.phone_number|default:'' }}">
+            <label for="phone">Number of Guests:</label>
+            <input type="number" id="guests_final" name="guests_final" required
+                value="{{ initial_data.guests|default:'' }}">
+        </div>
+
+        <!-- Hidden status field -->
+        <input type="hidden" name="status" id="status" value="Confirmed">
+
+        <div class="form-buttons">
+        <button type="submit" id="holdButton" class="reservation-button hold-button" onclick="setStatus('Hold')">Hold for 24 Hours</button>
+        <button type="submit" id="reserveButton" class="reservation-button reserve-button" onclick="setStatus('Confirmed')">Confirm Now</button>
+        </div>
+    </form>
+{% elif searched %}
+    {% if error %}
+        <p class="error-message">{{ error }}</p>
+    {% else %}
+        <p>No rooms available for the selected dates and guest count.</p>
+    {% endif %}
+{% endif %}
+</div>
+    <script>
+    // function to update hold or confirmed based on which button the customer clicks
+    function setStatus(value) {
+        document.getElementById('status').value = value;
+    }
+
+    // event listener to disable the buttons until form data is valid
+    document.addEventListener("DOMContentLoaded", () => {
+        const firstName = document.getElementById("first_name");
+        const lastName = document.getElementById("last_name");
+        const email = document.getElementById("email");
+        const phone = document.getElementById("phone");
+        const guests = document.getElementById("guests_final");
+
+        const holdBtn = document.getElementById("holdButton");
+        const confirmBtn = document.getElementById("reserveButton");
+
+        // Enable/disable Hold/Confirm buttons
+        function toggleReservationButtons() {
+            // Query the room radios **each time**, because they may be rendered dynamically
+            const roomRadios = document.querySelectorAll("input[name='room_type']");
+            const roomSelected = Array.from(roomRadios).some(radio => radio.checked);
+
+            const guestsFilled = firstName.value.trim() &&
+                                lastName.value.trim() &&
+                                email.value.trim() &&
+                                phone.value.trim() &&
+                                guests.value.trim();
+
+            const enable = guestsFilled && roomSelected;
+
+            holdBtn.disabled = !enable;
+            confirmBtn.disabled = !enable;
+        }
+
+        firstName.addEventListener("input", toggleReservationButtons);
+        lastName.addEventListener("input", toggleReservationButtons);
+        email.addEventListener("input", toggleReservationButtons);
+        phone.addEventListener("input", toggleReservationButtons);
+
+        // Use event delegation for room radios (handles dynamic rows)
+        document.addEventListener("change", (e) => {
+            if (e.target.name === "room_type") {
+                toggleReservationButtons();
+            }
+        });
+
+        // Initial state
+        toggleReservationButtons();
+    });
+    </script>
+
 {% endblock %}

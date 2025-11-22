@@ -1,10 +1,10 @@
-{#
+<!--
 CSD-460 Capstone Blue Team
 Moffat Bay Lodge Project
 Vee Bell, Deja Faison, Julia Gonzalez, Jess Monnier
 Professor Sue Sampson
 Developed October thru December of 2025
-#}
+-->
 
 {% load static %}
 <!DOCTYPE html>
@@ -24,7 +24,6 @@ Developed October thru December of 2025
           <li><a href="{% url 'about' %}" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">About</a></li>
           <li><a href="{% url 'attractions' %}" class="{% if request.resolver_match.url_name == 'attractions' %}active{% endif %}">Attractions</a></li>
           <li><a href="{% url 'reservation' %}" class="{% if request.resolver_match.url_name == 'reservation' %}active{% endif %}">Reservations</a></li>
-          <li><a href="{% url 'contact' %}" class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a></li>
           {% if user.is_authenticated %}
             <li><a href="{% url 'account' %}" class="{% if request.resolver_match.url_name == 'account' %}active{% endif %}">Account</a></li>
             <li>
