@@ -34,6 +34,13 @@ def parse_dates(check_in_str, check_out_str):
     try:
         check_in = datetime.strptime(check_in_str, "%Y-%m-%d").date()
         check_out = datetime.strptime(check_out_str, "%Y-%m-%d").date()
+        today = timezone.localdate()
+
+        # Prevent past check-in
+        if check_in < today:
+            return None, None, "Check-in date cannot be in the past."
+
+        # Prevent check out day as or before check in bc that makes no sense
         if check_in >= check_out:
             return None, None, "Check-out date must be after check-in date."
         return check_in, check_out, None
@@ -178,6 +185,16 @@ def reservation(request):
     # flag for whether user attempted search
     context['searched'] = 'check_in' in request.GET
 
+    # Use each search as an opportunity to cancel held reservations
+    # that have expired already
+    if context['searched']:
+        now = timezone.now()
+        Reservation.objects.filter(
+            status = 'Hold',
+            expiration_time__isnull=False,
+            expiration_time__lt=now
+        ).update(status='Cancelled')
+
     # Get input from form
     check_in_str = request.GET.get('check_in', '')
     check_out_str = request.GET.get('check_out', '')
@@ -214,6 +231,25 @@ def reservation(request):
             if error:
                 context['error'] = error
             else:
+                # Check if customer has overlapping dates already
+                overlapping_reservations = []
+                now = timezone.now()
+                overlapping_reservations = Reservation.objects.filter(
+                    customer=customer
+                ).filter(
+                    Q(status='Confirmed') |
+                    Q(status='Hold', expiration_time__gt=now)
+                ).filter(
+                    Q(start_date__lt=check_out) &
+                    Q(end_date__gt=check_in)
+                )
+                print(overlapping_reservations)
+
+                if overlapping_reservations.exists():
+                    context["overlap_warning"] = True
+                    context["overlapping_reservations"] = overlapping_reservations
+                
+                # Check availability of rooms
                 context['available_room_types'] = get_available_rooms(
                     check_in, check_out,
                     num_guests=num_guests,
@@ -307,6 +343,16 @@ def save_reservation(request):
 
     return render(request, "pages/confirmation.html", context)
 
+@login_required(login_url='login')
+def reservation_detail(request, reservation_id):
+    reservation = get_object_or_404(
+        Reservation, 
+        id=reservation_id, 
+        customer=request.user.customer
+    )
+    return render(request, 'pages/confirmation.html', {"reservation": reservation})
+
+@login_required(login_url='login')
 def confirmation(request):
     if request.method != "POST":
         return redirect("reservation")

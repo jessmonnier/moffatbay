@@ -36,6 +36,22 @@ Developed October thru December of 2025
     <button class="reservation-button reserve-button" id="checkButton" type="submit">Check Availability</button>
     </center>
 </form>
+{% if overlap_warning %}
+    <div class="error-message">
+        <strong>Notice:</strong> You already have an existing reservation that overlaps
+        with the selected dates. You may still continue if this is intentional.
+
+        <ul>
+            {% for r in overlapping_reservations %}
+            <li>
+                {{ r.status }} reservation:
+                {{ r.start_date }} → {{ r.end_date }}
+                | <a href="{% url 'reservation_detail' r.id %}">View / Manage</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
 
 {% if available_room_types %}
     <h3>Available Room Types</h3>
@@ -144,6 +160,7 @@ Developed October thru December of 2025
         lastName.addEventListener("input", toggleReservationButtons);
         email.addEventListener("input", toggleReservationButtons);
         phone.addEventListener("input", toggleReservationButtons);
+        guests.addEventListener("input", toggleReservationButtons);
 
         // Use event delegation for room radios (handles dynamic rows)
         document.addEventListener("change", (e) => {

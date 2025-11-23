@@ -91,6 +91,7 @@ header nav ul li a.active {
     padding: 8px 12px;
     border-radius: 5px;
     margin-bottom: 10px;
+    margin-top: 10px;
     font-size: 0.9rem;
 }
 
@@ -101,6 +102,7 @@ header nav ul li a.active {
     padding: 8px 12px;
     border-radius: 5px;
     margin-bottom: 10px;
+    margin-top: 10px;
     font-size: 0.9rem;
 }
 
@@ -339,10 +341,11 @@ footer {
     margin-bottom: 90px;
 }
 
-.contactForm{
+.contactForm {
     background-color: white;
     width: auto;
 /* Reservation-specific styling */
+}
 .reservationForm label {
     display: inline-block;
     width: 150px;
