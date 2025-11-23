@@ -23,29 +23,29 @@
   <p>Thank you, {{ first_name }} {{ last_name }}. Please review your reservation details below:</p>
 
   <hr />
-
+    
   <section style="margin-bottom: 16px;">
     <h3 style="margin-bottom: 4px;">Reservation Number</h3>
-    <p><strong>{{ reservation_number }}</strong></p>
+     <p><strong>{{ reservation.id }}</strong></p>
   </section>
 
   <section style="margin-bottom: 16px;">
-    <h3 style="margin-bottom: 4px;">Guest Information</h3>
-    <ul style="list-style: none; padding-left: 0;">
-      <li><strong>Name:</strong> {{ first_name }} {{ last_name }}</li>
-      <li><strong>Email:</strong> {{ email }}</li>
-      <li><strong>Phone:</strong> {{ phone }}</li>
-    </ul>
+  <h3 style="margin-bottom: 4px;">Guest Information</h3>
+  <ul style="list-style: none; padding-left: 0;">
+    <li><strong>Name:</strong> {{ reservation.guest_first_name }} {{ reservation.guest_last_name }}</li>
+    <li><strong>Email:</strong> {{ reservation.guest_email }}</li>
+    <li><strong>Phone:</strong> {{ reservation.guest_phone }}</li>
+  </ul>
   </section>
 
   <section style="margin-bottom: 16px;">
-    <h3 style="margin-bottom: 4px;">Stay Details</h3>
-    <ul style="list-style: none; padding-left: 0;">
-      <li><strong>Check-in:</strong> {{ check_in }}</li>
-      <li><strong>Check-out:</strong> {{ check_out }}</li>
-      <li><strong>Number of Guests:</strong> {{ guests }}</li>
-      <li><strong>Room Type:</strong> {{ room_type }}</li>
-    </ul>
+  <h3 style="margin-bottom: 4px;">Stay Details</h3>
+  <ul style="list-style: none; padding-left: 0;">
+    <li><strong>Check-in:</strong> {{ reservation.start_date }}</li>
+    <li><strong>Check-out:</strong> {{ reservation.end_date }}</li>
+    <li><strong>Number of Guests:</strong> {{ reservation.guests }}</li>
+    <li><strong>Room Type:</strong> {{ reservation.room_type.name }}</li>
+  </ul>
   </section>
 
   <section style="margin-bottom: 16px;">
