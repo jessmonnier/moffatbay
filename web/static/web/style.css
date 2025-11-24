@@ -145,6 +145,49 @@ footer {
     z-index: 1000;     /* Ensure it sits above other content */
 }
 
+/* Login page */
+.loginForm label {
+    display: inline-block;
+    width: 150px;
+    text-align: right;
+    padding-right: 15px;
+}
+.loginForm input, .reservationForm select {
+    display: inline-block;
+    width: 220px;
+    margin-bottom: 10px;
+    padding: 5px;
+    height: 35px;
+    border-width: 1px;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.loginPanel {
+    background-color: white;
+    width: 450px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+/* Small unobtrusive icon inside the password field */
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 40%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.password-toggle:hover {
+    opacity: 1;
+}
+
 /* Register page */
 .registerPanel {
     background-color: white;
@@ -346,31 +389,6 @@ footer {
     width: auto;
 /* Reservation-specific styling */
 }
-.reservationForm label {
-    display: inline-block;
-    width: 150px;
-    text-align: right;
-    padding-right: 15px;
-}
-.reservationForm input, .reservationForm select {
-    display: inline-block;
-    width: 220px;
-    margin-bottom: 10px;
-    padding: 5px;
-    height: 35px;
-    border-width: 1px;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-.reservationPanel {
-    background-color: white;
-    width: 450px;
-    margin: auto;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-}
 
 .contactForm h3{
     text-align: center;
@@ -479,4 +497,30 @@ table.reservation-table tr:nth-child(even) {
 
 table.reservation-table tr:hover {
     background-color: #f1f7ff;
+}
+
+.reservationForm label {
+    display: inline-block;
+    width: 150px;
+    text-align: right;
+    padding-right: 15px;
+}
+.reservationForm input, .reservationForm select {
+    display: inline-block;
+    width: 220px;
+    margin-bottom: 10px;
+    padding: 5px;
+    height: 35px;
+    border-width: 1px;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.reservationPanel {
+    background-color: white;
+    width: 450px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }

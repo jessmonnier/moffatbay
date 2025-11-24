@@ -332,6 +332,8 @@ def save_reservation(request):
 
     # Build context for confirmation template
     context = {
+        "first_name": first_name,
+        "last_name": last_name,
         "reservation": reservation,
         "is_hold": status == "Hold",
         "price_per_night": room_type.price_per_night,
@@ -350,7 +352,36 @@ def reservation_detail(request, reservation_id):
         id=reservation_id, 
         customer=request.user.customer
     )
-    return render(request, 'pages/confirmation.html', {"reservation": reservation})
+
+    # Compute nights
+    nights = (reservation.end_date - reservation.start_date).days
+    if nights < 1:
+        nights = 1  # safety fallback
+    
+    # Get room info
+    room_type = reservation.room_type
+    price_per_night = room_type.price_per_night if room_type else None
+    total_cost = nights * price_per_night if price_per_night else None
+
+    context = {
+        "first_name": reservation.guest_first_name,
+        "last_name": reservation.guest_last_name,
+        "email": reservation.guest_email,
+        "phone": reservation.guest_phone,
+        "check_in": reservation.start_date,
+        "check_out": reservation.end_date,
+        "guests": reservation.guests,
+        "room_type": room_type.name if room_type else "",
+        "price_per_night": price_per_night,
+        "nights": nights,
+        "total_cost": total_cost,
+        "reservation_number": reservation.id,   # ID = confirmation number
+        "invalid_emails": [],                  # none on detail page
+        "reservation": reservation,            # entire object just in case
+        "is_hold": reservation.status == "Hold",
+    }
+
+    return render(request, 'pages/confirmation.html', context)
 
 @login_required(login_url='login')
 def confirmation(request):

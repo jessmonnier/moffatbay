@@ -23,7 +23,7 @@ Developed October thru December of 2025
   {% if form.errors %}
     <p style="color: red;">Please check your username and password.</p>
   {% endif %}
-
+<div class=loginForm>
 <form method="post">
   {% csrf_token %}
 
@@ -32,37 +32,42 @@ Developed October thru December of 2025
     {{ form.username }}
   </p>
 
-  <p>
+<p style="position: relative;">
   <label for="{{ form.password.id_for_label }}">Password:</label>
+
   <input 
       type="password" 
       name="{{ form.password.name }}" 
       id="password-field"
-      value=""
       required
   >
 
-  <button type="button" id="togglePassword" style="margin-left: 8px;">
-      Show
-  </button>
+  <span id="togglePassword" class="password-toggle" title="Show password">
+      👁️
+  </span>
 </p>
 
   <button class="submitButton" type="submit">Login</button>
 </form>
+</div>
 
-  <p>Don't have an account yet?
+  <p align="center">Don't have an account yet?
     <a href="{% url 'register' %}">Register here</a>.
   </p>
+
 </div>
 
 <script>
 document.getElementById("togglePassword").addEventListener("click", function () {
     const passwordField = document.getElementById("password-field");
-    const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
-    passwordField.setAttribute("type", type);
+    const isHidden = passwordField.type === "password";
+    passwordField.type = isHidden ? "text" : "password";
 
-    // Change button text
-    this.textContent = type === "password" ? "Show" : "Hide";
+    // swap icon
+    this.textContent = isHidden ? "🙈" : "👁️";
+
+    // Update hover text
+    this.title = isHidden ? "Hide password" : "Show password";
 });
 </script>
 
