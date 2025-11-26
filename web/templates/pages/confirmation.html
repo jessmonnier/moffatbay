@@ -1,7 +1,7 @@
 {% extends 'pages/base.html' %}
 
 {% block title %}Reservation Summary | Moffat Bay Lodge{% endblock %}
-
+ 
 {% block content %}
 <div style="max-width: 700px; margin: 0 auto; padding: 20px; border: 1px solid #ccc;
             border-radius: 8px; background-color: #fafafa;">
@@ -20,22 +20,17 @@
   {% endif %}
 
   <h2 style="margin-top: 0;">Reservation Summary</h2>
-  {% if is_hold %}
-    <div style="padding: 8px 12px; background-color: #fff3cd; border: 1px solid #ffeeba;
-                color: #856404; border-radius: 4px; margin-bottom: 15px;">
-      <strong>Status:</strong> Reservation On Hold  
-      <br>
-      <span style="font-size: 0.9rem;">
-        Payment or confirmation is still required. Your room is not fully secured yet.
-      </span>
-    </div>
-  {% else %}
-    <div style="padding: 8px 12px; background-color: #d4edda; border: 1px solid #c3e6cb;
-                color: #155724; border-radius: 4px; margin-bottom: 15px;">
-      <strong>Status:</strong> Reservation Confirmed
-    </div>
-  {% endif %}
-  <p>Thank you, {{ first_name }} {{ last_name }}. Please review your reservation details below:</p>
+
+<button onclick="window.print()" class="print-btn">
+    Print Reservation
+</button>
+
+<p>
+  Thank you,
+  {{ reservation.guest_first_name }}
+  {{ reservation.guest_last_name }}.
+  Please review your reservation details below:
+</p>
 
   <hr />
     
@@ -62,6 +57,31 @@
     <li><strong>Room Type:</strong> {{ reservation.room_type.name }}</li>
   </ul>
   </section>
+
+<hr>
+
+<h3>Send Confirmation to Another Email</h3>
+
+<form action="{% url 'send_secondary_email' %}" method="post" style="margin-top: 10px;">
+    {% csrf_token %}
+    <input type="hidden" name="reservation_id" value="{{ reservation.id }}">
+
+    <label for="secondary_email"><strong>Additional Email:</strong></label>
+    <input type="email" id="secondary_email" name="secondary_email" required>
+    <button type="submit">Send Email</button>
+</form>
+
+{% if secondary_email_status %}
+  <p style="color: green; margin-top: 10px;">
+    {{ secondary_email_status }}
+  </p>
+{% endif %}
+
+{% if secondary_email_error %}
+  <p style="color: darkred; margin-top: 10px;">
+    {{ secondary_email_error }}
+  </p>
+{% endif %}
 
   <section style="margin-bottom: 16px;">
     <h3 style="margin-bottom: 4px;">Pricing Details</h3>
@@ -103,17 +123,11 @@
     </a>
   </div>
 
-{% if is_hold %}
   <p style="margin-top: 15px; font-size: 0.9rem; color: #555;">
-    Your reservation is currently <strong>on hold</strong>.  
-    Please complete any required steps to finalize your booking.
+    If everything looks correct, your reservation has been recorded. You should
+    also receive a confirmation email at the address(es) you provided.
   </p>
-{% else %}
-  <p style="margin-top: 15px; font-size: 0.9rem; color: #555;">
-    Your reservation is <strong>confirmed</strong>.  
-    A confirmation email has been sent to the address(es) you provided.
-  </p>
-{% endif %}
-
 </div>
+
+
 {% endblock %}
