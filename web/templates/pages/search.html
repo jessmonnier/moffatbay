@@ -6,10 +6,70 @@ Professor Sue Sampson
 Developed October thru December of 2025
 -->
 
-{% extends 'pages/base.html' %}
+<!--
+CSD-460 Capstone Blue Team
+Moffat Bay Lodge Project
+Vee Bell, Deja Faison, Julia Gonzalez, Jess Monnier
+Professor Sue Sampson
+Developed October thru December of 2025
+-->
 
-{% block title %}Home | Moffat Bay Lodge{% endblock %}
+{% extends "pages/base.html" %}
+
+{% block title %}Search | Moffat Bay Lodge{% endblock %}
 
 {% block content %}
-    <h2>Placeholder - Search</h2>
+
+<h2>Search Reservations</h2>
+
+<p>Enter your reservation number and the email used when booking.</p>
+
+{% if lookup_error %}
+  <p style="color: darkred; font-weight: bold;">{{ lookup_error }}</p>
+{% endif %}
+
+<form method="post" style="margin-bottom: 20px;">
+  {% csrf_token %}
+  <p>
+    <label for="reservation_number"><strong>Reservation Number:</strong></label>
+    <input type="text" id="reservation_number" name="reservation_number"
+           value="{{ request.POST.reservation_number }}">
+  </p>
+  <p>
+    <label for="email"><strong>Email:</strong></label>
+    <input type="email" id="email" name="email"
+           value="{{ request.POST.email }}">
+  </p>
+  <button type="submit">Search</button>
+</form>
+
+{% if reservation %}
+  <hr />
+  <h3>Reservation Summary</h3>
+
+  <p><strong>Reservation Number:</strong> {{ reservation.id }}</p>
+
+  <h4>Guest Information</h4>
+  <ul>
+    <li><strong>Name:</strong> {{ reservation.guest_first_name }} {{ reservation.guest_last_name }}</li>
+    <li><strong>Email:</strong> {{ reservation.guest_email }}</li>
+    <li><strong>Phone:</strong> {{ reservation.guest_phone }}</li>
+  </ul>
+
+  <h4>Stay Details</h4>
+  <ul>
+    <li><strong>Check-in:</strong> {{ reservation.start_date }}</li>
+    <li><strong>Check-out:</strong> {{ reservation.end_date }}</li>
+    <li><strong>Guests:</strong> {{ reservation.guests }}</li>
+    <li><strong>Room Type:</strong> {{ reservation.room_type.name }}</li>
+  </ul>
+
+  <h4>Pricing</h4>
+  <ul>
+    <li><strong>Price per Night:</strong> ${{ price_per_night }}</li>
+    <li><strong>Nights:</strong> {{ nights }}</li>
+    <li><strong>Total Cost:</strong> ${{ total_cost }}</li>
+  </ul>
+{% endif %}
+
 {% endblock %}
