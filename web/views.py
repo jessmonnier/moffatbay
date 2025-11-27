@@ -16,6 +16,7 @@ from django.core.mail import send_mail
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.views.decorators.http import require_POST
 from .models import RoomType, Reservation, Room
 from django.db.models import Q
 from datetime import datetime, timedelta
@@ -528,9 +529,144 @@ def confirmation(request):
 
 @login_required(login_url='login')
 def search(request):
-    return render(request, 'pages/search.html')
+    """
+    Show a form to enter reservation number + email.
+    On POST, try to find the matching Reservation and show the details.
+    """
+    error_message = None
+    reservation = None
+    price_per_night = None
+    nights = None
+    total_cost = None
+
+    if request.method == "POST":
+        reservation_number = request.POST.get("reservation_number", "").strip()
+        email = request.POST.get("email", "").strip()
+
+        # Basic validation
+        if not reservation_number or not email:
+            error_message = "Please enter both your reservation number and email."
+        else:
+            # Validate email format
+            try:
+                validate_email(email)
+            except ValidationError:
+                error_message = "Please enter a valid email address."
+            else:
+                # Try to look up the reservation
+                try:
+                    reservation = Reservation.objects.get(
+                        id=int(reservation_number),
+                        guest_email__iexact=email,
+                    )
+                except (Reservation.DoesNotExist, ValueError):
+                    reservation = None
+                    error_message = (
+                        "We could not find a reservation with that number and email."
+                    )
+
+    # If we found a reservation, compute price info like on confirmation
+    if reservation:
+        price_per_night = reservation.room_type.price_per_night
+        total_cost = reservation.total_cost
+
+        if reservation.start_date and reservation.end_date:
+            nights = (reservation.end_date - reservation.start_date).days
+            if nights < 1:
+                nights = 1
+
+    context = {
+        "lookup_error": error_message,
+        "reservation": reservation,
+        "price_per_night": price_per_night,
+        "nights": nights,
+        "total_cost": total_cost,
+    }
+
+    return render(request, "pages/search.html", context)
     
 def logout_view(request):
     if request.method == "POST":
         auth_logout(request)
     return redirect('index')
+
+@require_POST
+def send_secondary_email(request):
+    reservation_id = request.POST.get("reservation_id")
+    if not reservation_id:
+        # No ID -> nothing to email about, send back to start
+        return redirect("reservation")
+
+    reservation = get_object_or_404(Reservation, id=reservation_id)
+
+    secondary_email = request.POST.get("secondary_email", "").strip()
+    secondary_email_status = None
+    secondary_email_error = None
+
+    # Validate the email
+    try:
+        if not secondary_email:
+            raise ValidationError("Please enter an email address.")
+        validate_email(secondary_email)
+    except ValidationError as e:
+        secondary_email_error = f"'{secondary_email}' is not a valid email address. {e}"
+    else:
+        subject = f"Moffat Bay Lodge Reservation Confirmation #{reservation.id}"
+
+        body_lines = [
+            f"Dear {reservation.guest_first_name} {reservation.guest_last_name},",
+            "",
+            "Thank you for choosing Moffat Bay Lodge.",
+            f"Your reservation number is: {reservation.id}",
+            "",
+            "Reservation Details:",
+            f"  Room Type: {reservation.room_type.name}",
+            f"  Check-in: {reservation.start_date}",
+            f"  Check-out: {reservation.end_date}",
+            f"  Guests: {reservation.guests}",
+            f"  Price per night: ${reservation.room_type.price_per_night}",
+            f"  Total cost: ${reservation.total_cost}",
+        ]
+        body_lines.append("")
+        body_lines.append("We look forward to your stay at Moffat Bay Lodge.")
+
+        send_mail(
+            subject,
+            "\n".join(body_lines),
+            settings.DEFAULT_FROM_EMAIL,
+            [secondary_email],
+            fail_silently=False,
+        )
+
+        secondary_email_status = f"Confirmation email sent to {secondary_email}."
+
+    # Rebuild the same context you use in save_reservation()
+    context = {
+        "reservation": reservation,
+        "is_hold": reservation.status == "Hold" if hasattr(reservation, "status") else False,
+        "price_per_night": reservation.room_type.price_per_night,
+        "nights": (reservation.end_date - reservation.start_date).days,
+        "total_cost": reservation.total_cost,
+        "guests": reservation.guests,
+        "invalid_emails": [],
+        "secondary_email_status": secondary_email_status,
+        "secondary_email_error": secondary_email_error,
+    }
+
+    return render(request, "pages/confirmation.html", context)
+
+def print_reservation(request, reservation_id):
+    reservation = get_object_or_404(Reservation, id=reservation_id)
+
+    price_per_night = reservation.price_per_night
+    nights = reservation.nights
+    total_cost = reservation.total_cost
+
+    context = {
+        "reservation": reservation,
+        "price_per_night": price_per_night,
+        "nights": nights,
+        "total_cost": total_cost,
+    }
+
+    return render(request, "pages/print_reservation.html", context)
