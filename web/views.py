@@ -530,59 +530,86 @@ def confirmation(request):
 @login_required(login_url='login')
 def search(request):
     """
-    Show a form to enter reservation number + email.
-    On POST, try to find the matching Reservation and show the details.
+    Search reservations that belong to the logged-in user.
+
+    Option A: search by email (must be the same as account email)
+    Option B: search by first and/or last name, but still only within
+              reservations tied to the logged-in user's email.
     """
     error_message = None
-    reservation = None
-    price_per_night = None
-    nights = None
-    total_cost = None
+    results = []
+
+    # For re-populating form fields
+    form_email = ""
+    form_first_name = ""
+    form_last_name = ""
 
     if request.method == "POST":
-        reservation_number = request.POST.get("reservation_number", "").strip()
-        email = request.POST.get("email", "").strip()
+        search_type = request.POST.get("search_type")  # "email" or "name"
 
-        # Basic validation
-        if not reservation_number or not email:
-            error_message = "Please enter both your reservation number and email."
+        # Logged-in user must have an email on the account
+        if not request.user.email:
+            error_message = "Your account does not have an email configured."
         else:
-            # Validate email format
-            try:
-                validate_email(email)
-            except ValidationError:
-                error_message = "Please enter a valid email address."
-            else:
-                # Try to look up the reservation
-                try:
-                    reservation = Reservation.objects.get(
-                        id=int(reservation_number),
-                        guest_email__iexact=email,
-                    )
-                except (Reservation.DoesNotExist, ValueError):
-                    reservation = None
+            # Base queryset: only this account's reservations
+            base_qs = Reservation.objects.filter(
+                guest_email__iexact=request.user.email
+            )
+
+            # ------------ Option A: by email ------------
+            if search_type == "email":
+                email = request.POST.get("email", "").strip()
+                form_email = email
+
+                if not email:
+                    error_message = "Please enter your email address."
+                else:
+                    try:
+                        validate_email(email)
+                    except ValidationError:
+                        error_message = "Please enter a valid email address."
+                    else:
+                        # Enforce: can only search own account email
+                        if email.lower() != request.user.email.lower():
+                            error_message = (
+                                "You may only search using the email on your account."
+                            )
+                        else:
+                            results = base_qs.order_by("-start_date")
+                            if not results:
+                                error_message = (
+                                    "No reservations were found for this email address."
+                                )
+
+            # ------------ Option B: by first/last name ------------
+            elif search_type == "name":
+                first_name = request.POST.get("first_name", "").strip()
+                last_name = request.POST.get("last_name", "").strip()
+                form_first_name = first_name
+                form_last_name = last_name
+
+                if not first_name and not last_name:
                     error_message = (
-                        "We could not find a reservation with that number and email."
+                        "Please enter a first name, last name, or both to search."
                     )
+                else:
+                    qs = base_qs
+                    if first_name:
+                        qs = qs.filter(guest_first_name__icontains=first_name)
+                    if last_name:
+                        qs = qs.filter(guest_last_name__icontains=last_name)
 
-    # If we found a reservation, compute price info like on confirmation
-    if reservation:
-        price_per_night = reservation.room_type.price_per_night
-        total_cost = reservation.total_cost
-
-        if reservation.start_date and reservation.end_date:
-            nights = (reservation.end_date - reservation.start_date).days
-            if nights < 1:
-                nights = 1
+                    results = qs.order_by("-start_date")
+                    if not results:
+                        error_message = "No reservations matched your search."
 
     context = {
         "lookup_error": error_message,
-        "reservation": reservation,
-        "price_per_night": price_per_night,
-        "nights": nights,
-        "total_cost": total_cost,
+        "results": results,
+        "form_email": form_email,
+        "form_first_name": form_first_name,
+        "form_last_name": form_last_name,
     }
-
     return render(request, "pages/search.html", context)
     
 def logout_view(request):
