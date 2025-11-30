@@ -76,6 +76,26 @@ Developed October thru December of 2025
     </form>
   </div>
 
+<!-- Option C: Search by Reservation ID -->
+<div style="flex: 1 1 260px; border: 1px solid #ccc; padding: 15px; border-radius: 6px;">
+    <h3>Search by Reservation ID</h3>
+    <p>Enter your reservation ID to quickly find a reservation.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="search_type" value="reservation_id">
+
+        <p>
+            <label for="reservation_id"><strong>Reservation ID:</strong></label><br>
+            <input type="text" id="reservation_id" name="reservation_id"
+                   value="{{ form_reservation_id }}" style="width: 100%;" required>
+        </p>
+
+        <button type="submit">Search by Reservation ID</button>
+    </form>
+</div>
+
+
 </div>
 
 {% if results %}
@@ -97,7 +117,7 @@ Developed October thru December of 2025
       <tbody>
           {% for r in results %}
               <tr>
-                  <td>{{ r.id }}</td>
+                  <td><a href="{% url 'reservation_detail' r.public_id %}">{{ r.public_id }}</a></td>
                   <td>{{ r.guest_first_name }} {{ r.guest_last_name }}</td>
                   <td>{{ r.room_type.name }}</td>
                   <td>{{ r.start_date }}</td>

@@ -1,15 +1,237 @@
-<!--
-CSD-460 Capstone Blue Team
-Moffat Bay Lodge Project
-Vee Bell, Deja Faison, Julia Gonzalez, Jess Monnier
-Professor Sue Sampson
-Developed October thru December of 2025
--->
-
 {% extends 'pages/base.html' %}
 
-{% block title %}Home | Moffat Bay Lodge{% endblock %}
+{% block title %}Account | Moffat Bay Lodge{% endblock %}
 
 {% block content %}
-    <h2>Placeholder - Account</h2>
+<div class="accountPanel">
+    <h2>Account Information</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="{{ message.tags }}-message">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Customer Info Update Form -->
+    <form method="post" action="{% url 'account' %}" class="account-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="update_info">
+        <h3>Personal Information</h3>
+        <label for="first_name">First Name:</label>
+        <input type="text" id="first_name" name="first_name" value="{{ customer.user.first_name }}" required>
+
+        <label for="last_name">Last Name:</label>
+        <input type="text" id="last_name" name="last_name" value="{{ customer.user.last_name }}" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" value="{{ customer.user.email }}" required>
+
+        <label for="phone_number">Phone Number:</label>
+        <input type="tel" id="phone_number" name="phone_number" value="{{ customer.phone_number|default:'' }}" required>
+
+        <label for="address_street">Street:</label>
+        <input type="text" id="address_street" name="address_street" value="{{ customer.address_street|default:'' }}">
+
+        <label for="address_city">City:</label>
+        <input type="text" id="address_city" name="address_city" value="{{ customer.address_city|default:'' }}">
+
+        <label for="address_state">State/Province:</label>
+        <input type="text" id="address_state" name="address_state" value="{{ customer.address_state|default:'' }}">
+
+        <label for="address_zipcode">ZIP/Postal Code:</label>
+        <input type="text" id="address_zipcode" name="address_zipcode" value="{{ customer.address_zipcode|default:'' }}">
+
+        <label for="address_country">Country:</label>
+        <input type="text" id="address_country" name="address_country" value="{{ customer.address_country|default:'' }}">
+
+        <button type="submit" name="update_customer" id="submitCustomer" class="account-button">Update Information</button>
+    </form>
+
+    <!-- Password Update Form -->
+    <form method="post" action="{% url 'account' %}" class="password-form" style="margin-top: 30px;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="update_password">
+        <h3>Update Password</h3>
+
+    <!-- Current Password -->
+    <label for="current_password">Current Password:</label>
+    <div class="label-toggle">
+        <input type="password" id="current_password" name="current_password" required>
+        <span id="toggleCurrentPassword" class="account-password-toggle" title="Show password">👁️</span>
+    </div>
+
+    <!-- New Password -->
+    <label for="new_password">New Password:</label>
+    <div class="label-toggle">
+        <input type="password" id="new_password" name="new_password" required>
+        <span id="toggleNewPassword" class="account-password-toggle" title="Show password">👁️</span>
+    </div>
+
+    <!-- Confirm Password -->
+    <label for="confirm_password">Confirm Password:</label>
+    <div class="label-toggle">
+        <input type="password" id="confirm_password" name="confirm_password" required>
+        <span id="toggleConfirmPassword" class="account-password-toggle" title="Show password">👁️</span>
+    </div>
+
+        <div class="passwordRequirments" style="margin-left: auto; margin-right: auto">
+            <p class="requirement" id="lengthRequirement"><span class="icon bad">✗</span> Password must be at least 8 characters</p>
+            <p class="requirement" id="numberRequirement"><span class="icon bad">✗</span> Must include 1 Number</p>
+            <p class="requirement" id="uppercaseRequirement"><span class="icon bad">✗</span> Must include 1 UPPERCASE Letter</p>
+            <p class="requirement" id="lowercaseRequirement"><span class="icon bad">✗</span> Must include at least 1 lowercase letter</p>
+            <p class="requirement" id="matchRequirement"><span class="icon bad">✗</span> Passwords must match</p>
+        </div>
+
+        <button type="submit" name="update_password" id="submitPassword" class="account-button">Change Password</button>
+    </form>
+
+    <!-- Recent Reservations -->
+    <div class="recent-reservations" style="margin-top: 30px;">
+        <h3>Recent Reservations</h3>
+        {% if recent_reservations %}
+        <table class="reservation-table">
+            <thead>
+                <tr>
+                    <th>Reservation ID</th>
+                    <th>Room Type</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Status</th>
+                    <th>Total Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for res in recent_reservations %}
+                <tr>
+                    <td><a href="{% url 'reservation_detail' res.public_id %}">{{ res.public_id }}</a></td>
+                    <td>{{ res.room_type.name }}</td>
+                    <td>{{ res.start_date }}</td>
+                    <td>{{ res.end_date }}</td>
+                    <td>{{ res.status }}</td>
+                    <td>${{ res.total_cost }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if total_reservations > 5 %}
+        <p style="margin-top:10px;">
+            <a href="{% url 'reservation' %}">View all reservations</a>
+        </p>
+        {% endif %}
+        {% else %}
+        <p>You have no reservations.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+const accountForm = document.querySelector(".account-form");
+const phoneInput = document.getElementById("phone_number");
+const emailInput = document.getElementById("email");
+const pwd = document.getElementById("new_password");
+const confirmPwd = document.getElementById("confirm_password");
+const pwdBtn = document.getElementById("submitPassword");
+
+// --- Phone Validation ---
+function validatePhone() {
+    const value = phoneInput.value.trim();
+    const phoneRegex = /^(\(\d{3}\)\s?|\d{3}-?)\d{3}-?\d{4}$/;
+    
+    if (phoneRegex.test(value)) {
+        phoneInput.style.borderColor = "green";
+        return true;
+    } else {
+        phoneInput.style.borderColor = "red";
+        return false;
+    }
+}
+
+// --- Email Validation ---
+function validateEmail() {
+    const value = emailInput.value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (emailRegex.test(value)) {
+        emailInput.style.borderColor = "green";
+        return true;
+    } else {
+        emailInput.style.borderColor = "red";
+        return false;
+    }
+}
+
+// --- Password Validation ---
+function updateReq(id, condition) {
+    const item = document.getElementById(id).querySelector(".icon");
+    if (condition) {
+        item.textContent = "✓";
+        item.classList.remove("bad");
+        item.classList.add("good");
+    } else {
+        item.textContent = "✗";
+        item.classList.remove("good");
+        item.classList.add("bad");
+    }
+}
+
+function validatePassword() {
+    const value = pwd.value;
+    const lengthValid = value.length >= 8;
+    const uppercaseValid = /[A-Z]/.test(value);
+    const lowercaseValid = /[a-z]/.test(value);
+    const numberValid = /[0-9]/.test(value);
+    const passwordsMatch = value === confirmPwd.value && value.length > 0;
+
+    updateReq("lengthRequirement", lengthValid);
+    updateReq("uppercaseRequirement", uppercaseValid);
+    updateReq("lowercaseRequirement", lowercaseValid);
+    updateReq("numberRequirement", numberValid);
+    updateReq("matchRequirement", passwordsMatch);
+
+    pwdBtn.disabled = !(lengthValid && uppercaseValid && lowercaseValid && numberValid && passwordsMatch);
+}
+
+// --- Live Validation ---
+[phoneInput].forEach(el => el.addEventListener("input", validatePhone));
+[emailInput].forEach(el => el.addEventListener("input", validateEmail));
+[pwd, confirmPwd].forEach(el => el.addEventListener("input", validatePassword));
+
+// --- Form Submission ---
+accountForm.addEventListener("submit", function(e) {
+    const phoneValid = validatePhone();
+    const emailValid = validateEmail();
+    
+    if (!phoneValid || !emailValid) {
+        e.preventDefault();
+        let msg = "Please correct the following fields:\n";
+        if (!phoneValid) msg += "- Phone number\n";
+        if (!emailValid) msg += "- Email address\n";
+        alert(msg);
+        
+        if (!phoneValid) phoneInput.focus();
+        else emailInput.focus();
+    }
+});
+
+// --- Password Show/Hide Toggle ---
+function setupToggle(toggleId, inputId) {
+    const toggle = document.getElementById(toggleId);
+    const input = document.getElementById(inputId);
+
+    toggle.addEventListener("click", () => {
+        const type = input.type === "password" ? "text" : "password";
+        input.type = type;
+        toggle.textContent = type === "password" ? "👁️" : "🙈";
+        toggle.title = type === "password" ? "Show password" : "Hide password";
+    });
+}
+
+// Set up all three toggles
+setupToggle("toggleCurrentPassword", "current_password");
+setupToggle("toggleNewPassword", "new_password");
+setupToggle("toggleConfirmPassword", "confirm_password");
+
+// Initialize password button state
+pwdBtn.disabled = true;
+</script>
 {% endblock %}

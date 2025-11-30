@@ -12,16 +12,21 @@ Developed October thru December of 2025
 {% block title %}Home | Moffat Bay Lodge{% endblock %}
 
 {% block content %}
-    <section class="hero">
-      <div class="hero-inner container">
-        <div class="hero-text">
-          <h2>Welcome to Moffat Bay</h2>
-          <p>Comfort, ocean views, and warm hospitality — book your stay today.</p>
-          <a class="btn" href="#booking">Book Now</a>
-        </div>
-        <img src="{% static 'web/images/whale.png' %}" alt="Whale leaping from the ocean" class="hero-img" />
+  <section class="hero">
+    <div class="hero-inner">
+      <!-- Left side: Text content -->
+      <div class="hero-text">
+        <h1>Welcome to Moffat Bay</h1>
+        <p>Experience comfort, stunning ocean views, and warm hospitality — your perfect getaway starts here.</p>
+        <a class="btn" href="{% url 'reservation' %}">Book Now</a>
       </div>
-    </section>
+
+      <!-- Right side: Whale background -->
+      <div class="hero-image-container">
+        &nbsp;
+      </div>
+    </div>
+  </section>
 
     <section id="rooms" class="container">
       <h3>Rooms & Suites</h3>
@@ -33,8 +38,9 @@ Developed October thru December of 2025
       <p>One paragraph telling the hotel story or mission.</p>
     </section>
 
-    <section id="contact" class="container">
-      <h3>Contact</h3>
-      <p>Email: info@example.com • Phone: (555) 555-5555</p>
-    </section>
+    <!-- Salmon image at bottom -->
+    <div class="salmon-container">
+        <img src="{% static 'web/images/salmon.png' %}" alt="Salmon" class="salmon-img">
+    </div>
+
 {% endblock %}

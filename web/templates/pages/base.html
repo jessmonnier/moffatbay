@@ -42,6 +42,11 @@ Developed October thru December of 2025
 
   <main>
     <div id="content">
+      {% if request.user.is_authenticated and request.user.is_staff %}
+      <div class="staff-banner">
+        You are logged in as a staff/admin user. This will change the functionality of some pages.
+      </div>
+    {% endif %}
     {% block content %}
     {% endblock %}
     </div>

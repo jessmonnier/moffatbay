@@ -46,7 +46,7 @@ Developed October thru December of 2025
             <li>
                 {{ r.status }} reservation:
                 {{ r.start_date }} → {{ r.end_date }}
-                | <a href="{% url 'reservation_detail' r.id %}">View / Manage</a>
+                | <a href="{% url 'reservation_detail' r.public_id %}">View / Manage</a>
             </li>
             {% endfor %}
         </ul>
@@ -67,6 +67,7 @@ Developed October thru December of 2025
                     <th>Select</th>
                     <th>Room Type</th>
                     <th>Price per Night</th>
+                    <th>Total Cost</th>
                     <th>Max Guests</th>
                     <th>Available Rooms</th>
                 </tr>
@@ -78,7 +79,8 @@ Developed October thru December of 2025
                         <input type="radio" name="room_type" value="{{ entry.room_type.id }}" required>
                     </td>
                     <td>{{ entry.room_type.name }}</td>
-                    <td>${{ entry.room_type.price_per_night }}</td>
+                    <td>${{ entry.price_per_night }}</td>
+                    <td>${{ entry.total_cost }}</td>
                     <td>{{ entry.room_type.max_guests }}</td>
                     <td>{{ entry.available_count }}</td>
                 </tr>
@@ -88,6 +90,22 @@ Developed October thru December of 2025
 
         <h3>Guest Information</h3>
         <div class="reservationForm">
+            {% if user.is_staff %}
+                <label for="customer_id">Select Customer:</label>
+                <select id="customer_id" name="customer_id">
+                    <option value="">-- Select a Customer --</option>
+                    {% for c in all_customers %}
+                        <option value="{{ c.id }}"
+                            data-first_name="{{ c.user.first_name }}"
+                            data-last_name="{{ c.user.last_name }}"
+                            data-email="{{ c.user.email }}"
+                            data-phone="{{ c.user.phone_number|default_if_none:'' }}"
+                        >
+                            {{ c.user.first_name }} {{ c.user.last_name }} ({{ c.user.email }})
+                        </option>
+                    {% endfor %}
+                </select>
+            {% endif %}
             <label for="first_name">First Name:</label>
             <input type="text" id="first_name" name="first_name" required
                 value="{{ initial_data.first_name|default:'' }}">
@@ -173,6 +191,27 @@ Developed October thru December of 2025
 
         // Initial state
         toggleReservationButtons();
+    });
+
+    // pre-fill customer fields based on customer selected from drop-down list
+    document.addEventListener("DOMContentLoaded", () => {
+        const customerSelect = document.getElementById("customer_id");
+        if (customerSelect) {
+            customerSelect.addEventListener("change", () => {
+                const selected = customerSelect.selectedOptions[0];
+                if (!selected || selected.value === "") return;
+
+                const firstName = selected.dataset.first_name || "";
+                const lastName = selected.dataset.last_name || "";
+                const email = selected.dataset.email || "";
+                const phone = selected.dataset.phone || "";
+
+                document.getElementById("first_name").value = firstName;
+                document.getElementById("last_name").value = lastName;
+                document.getElementById("email").value = email;
+                document.getElementById("phone").value = phone;
+            });
+        }
     });
     </script>
 

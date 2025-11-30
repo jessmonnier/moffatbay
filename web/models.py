@@ -7,6 +7,7 @@ Developed October thru December of 2025
 """
 
 from django.db import models
+import uuid
 from django.contrib.auth.models import User
 
 class Customer(models.Model):
@@ -144,6 +145,14 @@ class Reservation(models.Model):
         ('Cancelled', 'Cancelled'),
     ]
     # Use default `id` as primary key
+    # But generate a unique public_id for customers to see and use
+    public_id = models.CharField(
+        max_length=12,
+        unique=True,
+        editable=False,
+        help_text="Public-facing reservation ID."
+    )
+
     customer = models.ForeignKey(
         Customer,
         on_delete=models.SET_NULL,
@@ -217,6 +226,22 @@ class Reservation(models.Model):
 
     class Meta:
         db_table = 'reservations'
+    
+    # Override save to generate the public_id
+    def save(self, *args, **kwargs):
+        """
+        As a note, this does not check for collisions. It's EXTREMELY statistically
+        unlikely that an ID already in our database would be randomly generated again,
+        even if we had like a hundred thousand reservations in there, but there still
+        is a chance. I don't think it's worth implementing a check for this at this stage,
+        but we would want to for a real project.
+        """
+
+        # Only generate a new public_id if it does not already have one
+        if not self.public_id:
+            self.public_id = "MBL-" + uuid.uuid4().hex[:8].upper()
+        
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return f"Reservation {self.id} - {self.guest_first_name} {self.guest_last_name}"

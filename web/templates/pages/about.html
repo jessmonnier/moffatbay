@@ -30,6 +30,8 @@ Developed October thru December of 2025
                     <li> Outdoor activities including hiking, kayaking, and fishing</li>
                     <li> Tours guided by local experts to explore the natural beauty of the area</li>
                 </ul>
+            <a href="{% url 'reservation' %}" id="bookNowButton">Book Now</a> 
+            <br>
             </div><!--End of aboutCenterText-->
 
             <div class = "slideShowContainer">
@@ -70,27 +72,45 @@ Developed October thru December of 2025
                     Style="width:50px; height:auto;"> </a>
             </div><!--End of slideShowContainer-->
         </div><!--End of Center content-->
-         <a href="{% url 'reservation' %}" id="bookNowButton">Book Now</a> 
-        <br>
 
         <!--Spacing-->
         <div class = "emptySpace">
         </div>
 
+        <div class="contactInfo">
+            <h3>Contact Us</h3>
+            <ul>
+                <li><strong>By Phone</strong>: 555-555-5555</li>
+                <li><strong>By Email</strong>: Please use the form below</li>
+                <li><strong>By Mail</strong>: 129 Bay Drive, Moffat Bay, WA 93412</li>
+        </div>
+
+        <!-- Display success/error messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="{% if message.tags %}{{ message.tags }}-message{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
         <!--Contact Us -->
-        <div class = "contactUsContainer">
-            <Form class = "contactForm">
+
+        <div class="contactUsContainer">
+            <form method="post" class="contactForm">
+                {% csrf_token %}
                 <h2>Share your thoughts!</h2>
-                <p>Please fill out the form below to get in touch:</p><br>
-                <label for="firstName">First Name:</label><br>
-                <input type="text" id="firstName" name="firstName" required placeholder="First Name"><br>
-                <label for="lastName">Last Name:</label><br>
-                <input type="text" id="lastName" name="lastName" required placeholder="Last Name"><br>
-                <label for="email">Email:</label><br>
-                <input type="email" id="email" name="email" required placeholder="Email Address"><br>
-                <label for="message">Message:</label><br>
-                <textarea id="message" name="message" rows="4" cols="50" required placeholder="Your message here..."></textarea><br>
-                <input type="submit" class="submitButton" id="submitButton" value="Send Message" style = "width: 150px;">
+                <p>Please fill out the form below to get in touch:</p>
+                
+                {% for field in form %}
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label><br>
+                    {{ field }}<br>
+                    {% if field.errors %}
+                        <span class="error-message">{{ field.errors }}</span><br>
+                    {% endif %}
+                {% endfor %}
+                
+                <input type="submit" class="submitButton" value="Send Message" style="width: 150px;">
             </form>
         </div>
         <!--Contact Us Form-->
