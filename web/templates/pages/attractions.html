@@ -7,9 +7,50 @@ Developed October thru December of 2025
 -->
 
 {% extends 'pages/base.html' %}
-
-{% block title %}Home | Moffat Bay Lodge{% endblock %}
+{% load static %}
+{% block title %} Attractions | Moffat Bay Lodge{% endblock %}
 
 {% block content %}
-    <h2>Placeholder - Attractions</h2>
+    <h2>Local Attractions</h2>
+    <h3> Remote, scenic and developing</h3>
+    <div class = "travelWarning">
+        <img src="{% static 'web/images/warning.png' %}">
+        <p>Note: Moffat Bay is new and remote- <span style = "font-weight: bold;"> 
+            reachable only by boat or plane.</span>
+            <span style = "font-style:italic;">Limited services on the island- please plan accordingly</span>
+        </p>
+    </div>
+    <!--Attraction Container-->
+    <div class = "attractionsContainer">
+
+        <div class = "attractionCard">
+            <img src="{% static 'web/images/coastalHike.jpg' %}">
+            <figcaption>Photo by <a href="https://unsplash.com/@yohantha?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Yohantha Gunawarna</a> on <a href="https://unsplash.com/photos/a-view-of-a-beach-from-a-cliff-N9qiW2n6Wm8?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></figcaption>
+            <h4> Seafarer's Trail</h4>
+            <p> A short coastal hike with lookut points</p>
+        </div>
+
+        <div class = "attractionCard">
+            <img src = "{% static 'web/images/harborKayaking.jpg'%}">
+            <figcaption>Photo by <a href="https://unsplash.com/@worldsbetweenlines?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Patrick Hendry</a> on <a href="https://unsplash.com/photos/person-riding-kayak-on-body-of-water-xv0lD7uG1N8?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></figcaption>
+            <h4> Harbor Cove Kayaking</h4>
+            <p> Rent a kayak and explore the coast of the island with or without a guide!</p>
+        </div>
+
+        <div class = "attractionCard">
+            <img src = "{% static 'web/images/whaleWatching.jpg'%}">
+            <figcaption>Photo by <a href="https://unsplash.com/@dmey503?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Dan Meyers</a> on <a href="https://unsplash.com/photos/a-large-body-of-water-with-a-small-island-in-the-background-2MpkltpGsRI?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></figcaption>
+            <h4> Whale Watching</h4>
+            <p> Board a boat with a seasoned guide to seek out a local pod of whales!</p>
+        </div>
+
+        <div class = "attractionCard">
+            <img src = "{% static 'web/images/scuba.jpg'%}">
+            <figcaption>Photo by <a href="https://unsplash.com/@uberscubagili?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Uber Scuba Gili</a> on <a href="https://unsplash.com/photos/man-in-black-wetsuit-diving-on-water-bUQN08cphno?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></figcaption>
+            <h4> Scuba Diving</h4>
+            <p> Take scuba lessons, get certified, or go out with a seasoned instructor</p>
+        </div>
+    </div>
+
+    <!--Icon by: <a href="https://www.flaticon.com/free-icons/warning" title="warning icons">Warning icons created by juicy_fish - Flaticon</a>-->
 {% endblock %}
