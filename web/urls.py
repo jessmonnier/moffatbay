@@ -27,4 +27,8 @@ urlpatterns = [
     path('reservation/<slug:public_id>/', views.reservation_detail, name='reservation_detail'),
     path('search/', views.search, name='search'),
     path("send-secondary-email/", views.send_secondary_email, name="send_secondary_email"),
+    path("reservation/<slug:public_id>/confirm/", views.confirm_hold, name="confirm_hold_reservation"),
+    path("reservation/<slug:public_id>/cancel/", views.cancel_reservation, name="cancel_reservation"),
+    path("reservation/<slug:public_id>/modify/", views.reservation_modify, name="reservation_modify"),
+    path("reservation/<slug:public_id>/retry/", views.retry_hold, name="retry_hold_availability"),
 ]

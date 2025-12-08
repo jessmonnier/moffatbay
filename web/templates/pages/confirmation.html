@@ -9,8 +9,21 @@ Developed October thru December of 2025
 {% extends 'pages/base.html' %}
 
 {% block title %}Reservation Summary | Moffat Bay Lodge{% endblock %}
- 
+
 {% block content %}
+
+{% if error %}
+  <div class="error-message">
+    {{ error }}
+  </div>
+{% endif %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="{{ message.tags }}-message">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+  
 <div style="max-width: 700px; margin: 0 auto; padding: 20px; border: 1px solid #ccc;
             border-radius: 8px; background-color: #fafafa;">
 
@@ -119,12 +132,54 @@ Developed October thru December of 2025
   </p>
 {% endif %}
 
-  <hr />
+<hr>
+
+{% if reservation.status == "Hold" %}
+  {% if reservation.expiration_time and reservation.expiration_time < now %}
+      <!-- Hold is expired -->
+      <div style="margin: 15px 0; padding: 10px; background: #fff3cd; border: 1px solid #ffeeba;">
+        <strong>This reservation hold has expired.</strong>
+      </div>
+
+      <form method="post" action="{% url 'retry_hold_availability' reservation.public_id %}">
+        {% csrf_token %}
+        <button type="submit">Check Availability Again</button>
+      </form>
+
+  {% else %}
+      <!-- Hold is still active -->
+      <form method="post" action="{% url 'confirm_hold_reservation' reservation.public_id %}">
+        {% csrf_token %}
+        <button type="submit" style="background: #28a745; color: white;">Confirm Reservation</button>
+      </form>
+
+      <form method="post" action="{% url 'cancel_reservation' reservation.public_id %}" style="margin-top: 10px;">
+        {% csrf_token %}
+        <button type="submit" style="background: #b00020; color: white;">Cancel Reservation</button>
+      </form>
+  {% endif %}
+{% endif %}
+
+{% if reservation.status == "Confirmed" %}
+  {% if can_modify %}
+    <form method="get" action="{% url 'reservation_modify' reservation.public_id %}">
+      <button type="submit">Modify Reservation</button>
+    </form>
+
+    <form method="post" action="{% url 'cancel_reservation' reservation.public_id %}" style="margin-top: 10px;">
+      {% csrf_token %}
+      <button type="submit" style="background: #b00020; color: white;">Cancel Reservation</button>
+    </form>
+  {% else %}
+    <p style="color: #555; font-style: italic;">
+      This reservation cannot be modified or cancelled because it is expired, cancelled, or has already started.
+    </p>
+  {% endif %}
+{% endif %}
+
+<hr>
 
   <div style="display: flex; gap: 10px; margin-top: 10px;">
-    <form method="get" action="{% url 'reservation' %}">
-      <button type="submit">Edit / Update Reservation</button>
-    </form>
 
     <a href="{% url 'index' %}" style="align-self: center; text-decoration: none;">
       Back to Home

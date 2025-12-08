@@ -13,7 +13,6 @@ from django.core.mail import send_mail
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.conf import settings
-from django.views.decorators.http import require_POST
 from ..models import RoomType, Reservation, Customer
 from django.db.models import Q
 from datetime import timedelta
@@ -26,6 +25,7 @@ def reservation(request):
     room_types = RoomType.objects.all().order_by('name')
     context['room_types'] = room_types
     context['available_room_types'] = []
+
     # flag for whether user attempted search
     context['searched'] = 'check_in' in request.GET
 
@@ -51,6 +51,10 @@ def reservation(request):
         "check_out": check_out_str or "",
         "room_type": selected_room_type_id or "",
         "guests": num_guests or "",
+        "first_name": request.GET.get('first_name', ''),
+        "last_name": request.GET.get('last_name', ''),
+        "email": request.GET.get('email', ''),
+        "phone_number": request.GET.get('phone_number', ''),
     }
     
     # Allow staff to make reservations for existing customers
@@ -66,7 +70,7 @@ def reservation(request):
             "first_name": customer.user.first_name,
             "last_name": customer.user.last_name,
             "email": customer.user.email,
-            "phone": customer.phone_number,
+            "phone_number": customer.phone_number,
         })
 
     context['initial_data'] = initial_data
@@ -142,7 +146,7 @@ def save_reservation(request):
     first_name = request.POST.get("first_name") or customer.user.first_name
     last_name = request.POST.get("last_name") or customer.user.last_name
     email = request.POST.get("email") or customer.user.email
-    phone = request.POST.get("phone") or customer.phone_number
+    phone_number = request.POST.get("phone_number") or customer.phone_number
     check_in_str = request.POST.get("check_in")
     check_out_str = request.POST.get("check_out")
     guests = int(request.POST.get("guests_final"))
@@ -154,6 +158,42 @@ def save_reservation(request):
         messages.error(request, error)
         return redirect("reservation")
 
+    # Validate email
+    try:
+        validate_email(email)
+    except ValidationError:
+        initial_data = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "email": email,
+            "phone_number": phone_number,
+            "check_in": check_in_str,
+            "check_out": check_out_str,
+            "guests": guests,
+            "room_type": room_type_id,
+        }
+
+        context = {
+            "initial_data": initial_data,
+            "error": "The email address provided is invalid. Please enter a valid email.",
+            "searched": True,
+            "room_types": RoomType.objects.all().order_by('name'),
+            "available_room_types": get_available_rooms(
+                check_in, 
+                check_out,
+                num_guests=guests,
+                selected_room_type_id=room_type_id
+            ),
+        }
+
+        # Include staff dropdown if needed
+        if request.user.is_staff:
+            context["all_customers"] = Customer.objects.filter(
+                user__is_staff=False
+            ).order_by('user__first_name', 'user__last_name')
+
+        return render(request, "pages/reservation.html", context)
+
     room_type = get_object_or_404(RoomType, id=room_type_id)
     nights, total_cost = calculate_total_cost(check_in, check_out, room_type.price_per_night)
 
@@ -164,7 +204,7 @@ def save_reservation(request):
         guest_first_name=first_name,
         guest_last_name=last_name,
         guest_email=email,
-        guest_phone=phone,
+        guest_phone=phone_number,
         start_date=check_in,
         end_date=check_out,
         guests=guests,
@@ -229,12 +269,18 @@ def reservation_detail(request, public_id):
         reservation.start_date, 
         reservation.end_date,
         price_per_night)
+    
+    # Determine if modification/cancellation is allowed
+    can_modify = (
+        reservation.status == "Confirmed" and
+        reservation.start_date > timezone.localdate()
+    )
 
     context = {
         "first_name": reservation.guest_first_name,
         "last_name": reservation.guest_last_name,
         "email": reservation.guest_email,
-        "phone": reservation.guest_phone,
+        "phone_number": reservation.guest_phone,
         "check_in": reservation.start_date,
         "check_out": reservation.end_date,
         "guests": reservation.guests,
@@ -246,6 +292,8 @@ def reservation_detail(request, public_id):
         "invalid_emails": [],                  # none on detail page
         "reservation": reservation,            # entire object just in case
         "is_hold": reservation.status == "Hold",
+        "now": timezone.now(),
+        "can_modify": can_modify,
     }
 
     return render(request, 'pages/confirmation.html', context)
@@ -338,70 +386,3 @@ def search(request):
         "form_reservation_id": form_reservation_id,
     }
     return render(request, "pages/search.html", context)
-    
-
-
-@require_POST
-def send_secondary_email(request):
-    reservation_id = request.POST.get("reservation_id")
-    if not reservation_id:
-        # No ID -> nothing to email about, send back to start
-        return redirect("reservation")
-
-    reservation = get_object_or_404(Reservation, id=reservation_id)
-
-    secondary_email = request.POST.get("secondary_email", "").strip()
-    secondary_email_status = None
-    secondary_email_error = None
-
-    # Validate the email
-    try:
-        if not secondary_email:
-            raise ValidationError("Please enter an email address.")
-        validate_email(secondary_email)
-    except ValidationError as e:
-        secondary_email_error = f"'{secondary_email}' is not a valid email address. {e}"
-    else:
-        subject = f"Moffat Bay Lodge Reservation Confirmation #{reservation.public_id}"
-
-        body_lines = [
-            f"Dear {reservation.guest_first_name} {reservation.guest_last_name},",
-            "",
-            "Thank you for choosing Moffat Bay Lodge.",
-            f"Your reservation number is: {reservation.public_id}",
-            "",
-            "Reservation Details:",
-            f"  Room Type: {reservation.room_type.name}",
-            f"  Check-in: {reservation.start_date}",
-            f"  Check-out: {reservation.end_date}",
-            f"  Guests: {reservation.guests}",
-            f"  Price per night: ${reservation.room_type.price_per_night}",
-            f"  Total cost: ${reservation.total_cost}",
-        ]
-        body_lines.append("")
-        body_lines.append("We look forward to your stay at Moffat Bay Lodge.")
-
-        send_mail(
-            subject,
-            "\n".join(body_lines),
-            settings.DEFAULT_FROM_EMAIL,
-            [secondary_email],
-            fail_silently=False,
-        )
-
-        secondary_email_status = f"Confirmation email sent to {secondary_email}."
-
-    # Rebuild the same context you use in save_reservation()
-    context = {
-        "reservation": reservation,
-        "is_hold": reservation.status == "Hold" if hasattr(reservation, "status") else False,
-        "price_per_night": reservation.room_type.price_per_night,
-        "nights": (reservation.end_date - reservation.start_date).days,
-        "total_cost": reservation.total_cost,
-        "guests": reservation.guests,
-        "invalid_emails": [],
-        "secondary_email_status": secondary_email_status,
-        "secondary_email_error": secondary_email_error,
-    }
-
-    return render(request, "pages/confirmation.html", context)

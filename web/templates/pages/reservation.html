@@ -11,6 +11,7 @@ Developed October thru December of 2025
 {% block title %}Home | Moffat Bay Lodge{% endblock %}
 
 {% block content %}
+
 <div class="reservationPanel">
 <h2>Make a Reservation</h2>
 
@@ -99,7 +100,7 @@ Developed October thru December of 2025
                             data-first_name="{{ c.user.first_name }}"
                             data-last_name="{{ c.user.last_name }}"
                             data-email="{{ c.user.email }}"
-                            data-phone="{{ c.user.phone_number|default_if_none:'' }}"
+                            data-phone_number="{{ c.user.phone_number|default_if_none:'' }}"
                         >
                             {{ c.user.first_name }} {{ c.user.last_name }} ({{ c.user.email }})
                         </option>
@@ -115,10 +116,10 @@ Developed October thru December of 2025
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required
                 value="{{ initial_data.email|default:'' }}">
-            <label for="phone">Phone Number:</label>
-            <input type="tel" id="phone" name="phone" required
+            <label for="phone_number">Phone Number:</label>
+            <input type="tel" id="phone_number" name="phone_number" required
                 value="{{ initial_data.phone_number|default:'' }}">
-            <label for="phone">Number of Guests:</label>
+            <label for="guests_final">Number of Guests:</label>
             <input type="number" id="guests_final" name="guests_final" required
                 value="{{ initial_data.guests|default:'' }}">
         </div>
@@ -131,12 +132,11 @@ Developed October thru December of 2025
         <button type="submit" id="reserveButton" class="reservation-button reserve-button" onclick="setStatus('Confirmed')">Confirm Now</button>
         </div>
     </form>
-{% elif searched %}
-    {% if error %}
-        <p class="error-message">{{ error }}</p>
-    {% else %}
-        <p>No rooms available for the selected dates and guest count.</p>
-    {% endif %}
+{% elif searched and not error %}
+    <p>No rooms available for the selected dates and guest count.</p>
+{% endif %}
+{% if error %}
+    <p class="error-message">{{ error }}</p>
 {% endif %}
 <p>&nbsp;</p>
 <p align="center">Or would you rather <a href="{% url 'search' %}">lookup an existing reservation</a>?</p>
@@ -152,7 +152,7 @@ Developed October thru December of 2025
         const firstName = document.getElementById("first_name");
         const lastName = document.getElementById("last_name");
         const email = document.getElementById("email");
-        const phone = document.getElementById("phone");
+        const phone_number = document.getElementById("phone_number");
         const guests = document.getElementById("guests_final");
 
         const holdBtn = document.getElementById("holdButton");
@@ -167,7 +167,7 @@ Developed October thru December of 2025
             const guestsFilled = firstName.value.trim() &&
                                 lastName.value.trim() &&
                                 email.value.trim() &&
-                                phone.value.trim() &&
+                                phone_number.value.trim() &&
                                 guests.value.trim();
 
             const enable = guestsFilled && roomSelected;
@@ -179,7 +179,7 @@ Developed October thru December of 2025
         firstName.addEventListener("input", toggleReservationButtons);
         lastName.addEventListener("input", toggleReservationButtons);
         email.addEventListener("input", toggleReservationButtons);
-        phone.addEventListener("input", toggleReservationButtons);
+        phone_number.addEventListener("input", toggleReservationButtons);
         guests.addEventListener("input", toggleReservationButtons);
 
         // Use event delegation for room radios (handles dynamic rows)
@@ -204,12 +204,12 @@ Developed October thru December of 2025
                 const firstName = selected.dataset.first_name || "";
                 const lastName = selected.dataset.last_name || "";
                 const email = selected.dataset.email || "";
-                const phone = selected.dataset.phone || "";
+                const phone_number = selected.dataset.phone_number || "";
 
                 document.getElementById("first_name").value = firstName;
                 document.getElementById("last_name").value = lastName;
                 document.getElementById("email").value = email;
-                document.getElementById("phone").value = phone;
+                document.getElementById("phone_number").value = phone_number;
             });
         }
     });

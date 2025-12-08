@@ -1,0 +1,64 @@
+<!--
+CSD-460 Capstone Blue Team
+Moffat Bay Lodge Project
+Vee Bell, Deja Faison, Julia Gonzalez, Jess Monnier
+Professor Sue Sampson
+Developed October thru December of 2025
+-->
+
+{% extends 'pages/base.html' %}
+
+{% block title %}Modify Your Reservation | Moffat Bay Lodge{% endblock %}
+
+{% block content %}
+
+  {% if messages %}
+        {% for message in messages %}
+            <div class="{{ message.tags }}-message">{{ message }}</div>
+        {% endfor %}
+  {% endif %}
+
+<div class="reservationPanel">
+    <h3>Modify Reservation: {{ reservation.public_id }}</h3>
+
+    <form method="post" class="reservationForm">
+        {% csrf_token %}
+
+        <label>Check-In Date:</label>
+        <input type="date" name="check_in" value="{{ reservation.start_date|date:'Y-m-d' }}" required>
+        <br>
+
+        <label>Check-Out Date:</label>
+        <input type="date" name="check_out" value="{{ reservation.end_date|date:'Y-m-d' }}" required>
+        <br>
+
+        <label>Guests:</label>
+        <input type="number" min="1" max="10" name="guests" value="{{ reservation.guests }}" required>
+        <br>
+
+        <label>Room Type:</label>
+        <select name="room_type" required>
+            {% for rt in room_types %}
+                <option value="{{ rt.id }}" {% if reservation.room_type.id == rt.id %}selected{% endif %}>
+                    {{ rt.name }}
+                </option>
+            {% endfor %}
+        </select>
+        <br>
+
+        <label>Send Update Email To:</label>
+        <textarea name="extra_emails" rows="4" style="width: 220px;">{{ extra_emails_text }}</textarea>
+        <br><br>
+
+        <div class="form-buttons">
+            <button type="submit" class="reservation-button reserve-button">Save Changes</button>
+
+            <a href="{% url 'reservation_detail' reservation.public_id %}">
+                <button type="button" class="reservation-button hold-button">
+                    Cancel
+                </button>
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -10,3 +10,4 @@ Developed October thru December of 2025
 from .base_views import *
 from .account_views import *
 from .reservation_views import *
+from .reservation_extended_views import *
