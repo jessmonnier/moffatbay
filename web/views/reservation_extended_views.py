@@ -26,7 +26,7 @@ def send_secondary_email(request):
         # No ID -> nothing to email about, send back to start
         return redirect("reservation")
 
-    reservation = get_object_or_404(Reservation, id=reservation_id)
+    reservation = get_object_or_404(Reservation, public_id=reservation_id)
 
     secondary_email = request.POST.get("secondary_email", "").strip()
     secondary_email_status = None
@@ -228,6 +228,30 @@ def reservation_modify(request, public_id):
         reservation.guests = guests
         reservation.room_type = get_object_or_404(RoomType, id=room_type_id)
         reservation.save()
+
+        recipients, invalid = validate_emails(reservation.guest_email)
+
+        if recipients:
+            subject = f"Reservation Updated #{reservation.public_id}"
+            body = f"""Dear {reservation.guest_first_name},
+
+        Your reservation has been updated successfully.
+
+        Reservation number: {reservation.public_id}
+        Room type: {reservation.room_type.name}
+        Check-in: {reservation.start_date}
+        Check-out: {reservation.end_date}
+        Guests: {reservation.guests}
+
+        If you have any questions, please contact us.
+        """
+            send_mail(
+                subject,
+                body,
+                settings.DEFAULT_FROM_EMAIL,
+                list(recipients),
+                fail_silently=False,  # important while developing
+            )
 
         messages.success(request, "Reservation updated successfully.")
         return redirect("reservation_detail", public_id=reservation.public_id)

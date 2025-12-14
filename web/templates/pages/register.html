@@ -37,25 +37,44 @@ Developed October thru December of 2025
         {# Registration Panel #}
         <div class = "registerPanel">
             <h3>Create Your Account</h3>
-            <form method = "POST"  id ="registerForm" action ="{% url 'register' %}">
-                    {% csrf_token %}
-                <label> First Name: </label>
-                <input type = "text" name = "first_name" placeholder = "Jane">
-                <br>
-                <label> Last Name: </label>
-                <input type = "text" name = "last_name" placeholder = "Doe">
-                <br>
-                <label> Email: </label>
-                <input type = "Email" name = "email" placeholder = "example@gmail.com">
-                <br>
-                <label> Phone Number: </label>
-                <input type = "text" name = "phone_number" placeholder = "123-456-7890">
-                <br>
-                <label> Password:</label>
-                <input type = "password" name = "password" id="password">
-                <br>
-                <label> Confirm Password:</label>
-                <input id="confirm" type="password" name="confirm_password">
+            <form method="POST" id="registerForm" action="{% url 'register' %}">
+                {% csrf_token %}
+
+                <div class="form-row">
+                    <label>First Name:</label>
+                    <input type="text" name="first_name" placeholder="Jane">
+                </div>
+
+                <div class="form-row">
+                    <label>Last Name:</label>
+                    <input type="text" name="last_name" placeholder="Doe">
+                </div>
+
+                <div class="form-row">
+                    <label>Email:</label>
+                    <input type="email" name="email" placeholder="example@gmail.com">
+                </div>
+
+                <div class="form-row">
+                    <label>Phone Number:</label>
+                    <input type="text" name="phone_number" placeholder="123-456-7890">
+                </div>
+
+                <div class="form-row">
+                    <label>Password:</label>
+                    <div class="input-with-toggle">
+                        <input type="password" name="password" id="password" required>
+                        <span id="toggleFirstPassword" class="account-password-toggle">👁️</span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label>Confirm Password:</label>
+                    <div class="input-with-toggle">
+                        <input type="password" name="confirm_password" id="confirm_password" required>
+                        <span id="toggleSecondPassword" class="account-password-toggle">👁️</span>
+                    </div>
+                </div>
                 <br>
                 
                 {# Password requirements #}
@@ -76,7 +95,7 @@ Developed October thru December of 2025
 
         <script>
             const pwd = document.getElementById("password");
-            const confirmPwd = document.getElementById("confirm");
+            const confirmPwd = document.getElementById("confirm_password");
             const submitBtn = document.getElementById("submitButton");
             const termsCheckbox = document.querySelector("input[name='agreedToTerms']");
             const firstName = document.querySelector("input[name='first_name']");
@@ -132,6 +151,24 @@ Developed October thru December of 2025
                 el.addEventListener("input", validate);
             });
             termsCheckbox.addEventListener("change", validate);
+
+            // --- Password Show/Hide Toggle ---
+            function setupToggle(toggleId, inputId) {
+                const toggle = document.getElementById(toggleId);
+                const input = document.getElementById(inputId);
+
+                toggle.addEventListener("click", () => {
+                    const type = input.type === "password" ? "text" : "password";
+                    input.type = type;
+                    toggle.textContent = type === "password" ? "👁️" : "🙈";
+                    toggle.title = type === "password" ? "Show password" : "Hide password";
+                });
+            }
+
+            // Set up all three toggles
+            setupToggle("toggleFirstPassword", "password");
+            setupToggle("toggleSecondPassword", "confirm_password");
+
 
             // Start with button disabled
             submitBtn.disabled = true;

@@ -324,6 +324,30 @@ footer {
     border-radius: 5px;
 }
 
+.form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.form-row label {
+    width: 150px;
+    text-align: right;
+    padding-right: 15px;
+}
+
+.form-row input {
+    width: 220px;
+    padding: 5px;
+    height: 25px;
+    border-radius: 5px;
+}
+
+.input-with-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
 .passwordRequirments{
     font-size: 12px;

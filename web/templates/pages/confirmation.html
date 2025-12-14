@@ -23,6 +23,17 @@ Developed October thru December of 2025
         <div class="{{ message.tags }}-message">{{ message }}</div>
     {% endfor %}
 {% endif %}
+{% if secondary_email_status %}
+  <div class="success-message">
+    {{ secondary_email_status }}
+  </div>
+{% endif %}
+
+{% if secondary_email_error %}
+  <div class="error-message">
+    {{ secondary_email_error }}
+  </div>
+{% endif %}
   
 <div style="max-width: 700px; margin: 0 auto; padding: 20px; border: 1px solid #ccc;
             border-radius: 8px; background-color: #fafafa;">
@@ -119,18 +130,6 @@ Developed October thru December of 2025
     <input type="email" id="secondary_email" name="secondary_email" required>
     <button type="submit">Send Email</button>
 </form>
-
-{% if secondary_email_status %}
-  <p style="color: green; margin-top: 10px;">
-    {{ secondary_email_status }}
-  </p>
-{% endif %}
-
-{% if secondary_email_error %}
-  <p style="color: darkred; margin-top: 10px;">
-    {{ secondary_email_error }}
-  </p>
-{% endif %}
 
 <hr>
 
