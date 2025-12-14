@@ -102,7 +102,7 @@ def cancel_reservation(request, public_id):
     reservation.save()
 
     messages.success(request, "Your reservation has been cancelled.")
-    return redirect("search")  
+    return redirect("account")  
 
 @require_POST
 @login_required(login_url='login')
