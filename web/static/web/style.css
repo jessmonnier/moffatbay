@@ -241,7 +241,107 @@ footer {
         height: 300px; /* fixed height on mobile */
     }
 }
+/*Index Rooms and Suites Section*/
+/* Individual Suite card */
+.roomCard {
+    width: 280px;                   /* card width */
+    background: #ffffffd0;          /* soft white background */
+    border-radius: 10px;
+    overflow: hidden;               /* keeps image corners rounded */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    padding: 15px;           /* spacing under content */
 
+}
+
+/* Hover effect */
+.roomCard:hover {
+    transform: translateY(-5px);    /* lift up slightly */
+    box-shadow: 0 6px 14px rgba(0,0,0,0.20);
+}
+
+.roomTitle h3{
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+.roomCard h4{
+    font-size: 1.5em;
+    text-align: center;
+}
+
+.roomCard a{
+    padding: 12px 25px;
+}
+.roomCard .btn {
+  display: block;
+  text-align: center;
+  margin: 16 5px;
+  padding: 14px;
+  background-color: #3b82f6;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.roomContainer{
+    display: flex;
+    flex-wrap: wrap;               /* allows multiple cards per row */
+    gap: 30px;                     /* space between cards */
+    justify-content: center;       /* center them on the page */
+    padding: 20px; 
+}
+
+
+/* Card image */
+.roomCard img {
+    width: 100%;
+    height: 190px;
+    object-fit: cover;              /* crops nicely */
+    display: block;
+    border-radius: 6px;
+}
+/*Index About Us*/
+/* Inner flex container */
+.indexAboutContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 50px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 40px;
+}
+
+/* Text column */
+.indexAboutText {
+    flex: 2;
+}
+
+.indexAboutText h3 {
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+.indexAboutText p {
+    font-size: 16px;
+    line-height: 1.7;
+    max-width: 700px;
+}
+
+/* Image column */
+.indexAboutImage {
+    flex: 1;
+    text-align: center;
+}
+
+.indexAboutImage img {
+    width: 100%;
+    max-width: 300px;
+    border-radius: 12px;
+    opacity: 0.85;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
 .salmon-container {
     text-align: center; /* center the image horizontally */
     margin-top: 40px;   /* spacing from content above */
