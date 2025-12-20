@@ -7,15 +7,32 @@ Developed October thru December of 2025
 """
 
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
 from django.core.mail import send_mail
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from ..models import RoomType, Reservation
 from datetime import datetime
 
+# Handled by Django in URLs
+def login_view(request):
+    if request.method == "POST":
+        user = authenticate(
+            request,
+            username=request.POST["username"],
+            password=request.POST["password"]
+        )
+        if user:
+            login(request, user)
+            return redirect(request.GET.get("next", "reservation"))
+        else:
+            messages.error("Login failed! Please try again.")
+    return render(request, 'pages/login.html')
 
+# Handled by save_reservation and reservation_details
 @login_required(login_url='login')
 def confirmation(request):
     if request.method != "POST":

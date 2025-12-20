@@ -97,7 +97,7 @@ Developed October thru December of 2025
     <div class="recent-reservations" style="margin-top: 30px;">
         <h3>Recent Reservations</h3>
         {% if recent_reservations %}
-        <table class="reservation-table">
+        <table class="reservations-account">
             <thead>
                 <tr>
                     <th>Reservation ID</th>
@@ -110,7 +110,7 @@ Developed October thru December of 2025
             </thead>
             <tbody>
                 {% for res in recent_reservations %}
-                <tr>
+                <tr class="search-{{ res.status }}">
                     <td><a href="{% url 'reservation_detail' res.public_id %}">{{ res.public_id }}</a></td>
                     <td>{{ res.room_type.name }}</td>
                     <td>{{ res.start_date }}</td>

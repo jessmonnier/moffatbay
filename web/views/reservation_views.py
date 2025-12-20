@@ -13,13 +13,13 @@ from django.core.mail import send_mail
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.urls import reverse
 from ..models import RoomType, Reservation, Customer
 from django.db.models import Q
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.utils import timezone
 from web.views.helpers import get_available_rooms, parse_dates, validate_emails, calculate_total_cost
 
-@login_required(login_url='login')
 def reservation(request):
     context = {}
     room_types = RoomType.objects.all().order_by('name')
@@ -63,8 +63,10 @@ def reservation(request):
             user__is_staff=False
         ).order_by('user__first_name', 'user__last_name')
 
-    # Pre-fill guest info from user's Customer profile
-    customer = getattr(request.user, 'customer', None)
+    # Pre-fill guest info from user's Customer profile if logged in
+    customer = None
+    if request.user.is_authenticated:
+        customer = getattr(request.user, 'customer', None)
     if customer:
         initial_data.update({
             "first_name": customer.user.first_name,
@@ -86,22 +88,23 @@ def reservation(request):
                 context['error'] = error
             else:
                 # Check if customer has overlapping dates already
-                overlapping_reservations = []
-                now = timezone.now()
-                overlapping_reservations = Reservation.objects.filter(
-                    customer=customer
-                ).filter(
-                    Q(status='Confirmed') |
-                    Q(status='Hold', expiration_time__gt=now)
-                ).filter(
-                    Q(start_date__lt=check_out) &
-                    Q(end_date__gt=check_in)
-                )
-                print(overlapping_reservations)
+                if customer:
+                    overlapping_reservations = []
+                    now = timezone.now()
+                    overlapping_reservations = Reservation.objects.filter(
+                        customer=customer
+                    ).filter(
+                        Q(status='Confirmed') |
+                        Q(status='Hold', expiration_time__gt=now)
+                    ).filter(
+                        Q(start_date__lt=check_out) &
+                        Q(end_date__gt=check_in)
+                    )
+                    print(overlapping_reservations)
 
-                if overlapping_reservations.exists():
-                    context["overlap_warning"] = True
-                    context["overlapping_reservations"] = overlapping_reservations
+                    if overlapping_reservations.exists():
+                        context["overlap_warning"] = True
+                        context["overlapping_reservations"] = overlapping_reservations
                 
                 # Check availability of rooms
                 context['available_room_types'] = get_available_rooms(
@@ -127,6 +130,10 @@ def save_reservation(request):
     """
     if request.method != "POST":
             return redirect("reservation")
+    
+    if not request.user.is_authenticated:
+        messages.info(request, "Please log in or register to reserve a room.")
+        return redirect(f"{reverse('login')}?next={request.get_full_path()}")
         
     # Determine customer
     if request.user.is_staff:
@@ -153,16 +160,8 @@ def save_reservation(request):
     room_type_id = request.POST.get("room_type")
     status = request.POST.get("status", "Hold")
 
-    check_in, check_out, error = parse_dates(check_in_str, check_out_str)
-    if error:
-        messages.error(request, error)
-        return redirect("reservation")
-
-    # Validate email
-    try:
-        validate_email(email)
-    except ValidationError:
-        initial_data = {
+    room_type = get_object_or_404(RoomType, id=room_type_id)
+    initial_data = {
             "first_name": first_name,
             "last_name": last_name,
             "email": email,
@@ -172,7 +171,34 @@ def save_reservation(request):
             "guests": guests,
             "room_type": room_type_id,
         }
+    
+    check_in, check_out, error = parse_dates(check_in_str, check_out_str)
+    if error:
+        messages.error(request, error)
+        return redirect("reservation")
 
+    if guests > room_type.max_guests:
+        messages.error(
+            request,
+            f"The selected room type allows a maximum of {room_type.max_guests} guests."
+        )
+        context = {
+            "initial_data": initial_data,
+            "searched": True,
+            "available_room_types": get_available_rooms(
+                check_in, 
+                check_out,
+                num_guests=guests,
+                selected_room_type_id=room_type_id
+            ),
+        }
+
+        return redirect("reservation", context)
+
+    # Validate email
+    try:
+        validate_email(email)
+    except ValidationError:
         context = {
             "initial_data": initial_data,
             "error": "The email address provided is invalid. Please enter a valid email.",
@@ -239,28 +265,20 @@ def save_reservation(request):
             body.append("\nWe look forward to your stay at Moffat Bay Lodge.")
             send_mail(subject, "\n".join(body), settings.DEFAULT_FROM_EMAIL, list(recipients))
 
-    # Build context for confirmation template
-    context = {
-        "first_name": first_name,
-        "last_name": last_name,
-        "reservation": reservation,
-        "is_hold": status == "Hold",
-        "price_per_night": room_type.price_per_night,
-        "nights": nights,
-        "total_cost": total_cost,
-        "guests": guests,  # number of guests included in context
-        "invalid_emails": invalid_emails
-    }
-
-    return render(request, "pages/confirmation.html", context)
+    return redirect('reservation_detail', public_id=reservation.public_id)
 
 @login_required(login_url='login')
 def reservation_detail(request, public_id):
-    reservation = get_object_or_404(
-        Reservation, 
-        public_id=public_id,
-        customer=request.user.customer
-    )
+    if request.user.is_staff:
+        # Staff can see any reservation
+        reservation = get_object_or_404(Reservation, public_id=public_id)
+    else:
+        # Regular users can only see their own reservations
+        reservation = get_object_or_404(
+            Reservation, 
+            public_id=public_id,
+            customer=request.user.customer
+        )
     
     # Get room info
     room_type = reservation.room_type
@@ -275,6 +293,9 @@ def reservation_detail(request, public_id):
         reservation.status == "Confirmed" and
         reservation.start_date > timezone.localdate()
     )
+
+    reservation.start_datetime = datetime.combine(reservation.start_date, datetime.min.time())
+    reservation.start_datetime = timezone.make_aware(reservation.start_datetime)
 
     context = {
         "first_name": reservation.guest_first_name,
@@ -318,7 +339,7 @@ def search(request):
     form_reservation_id = ""
 
     if request.user.is_staff:
-        base_qs = Reservation.objects.all()
+        base_qs = Reservation.objects.ordered()
     else:
         customer = getattr(request.user, "customer", None)
         if not customer:
@@ -326,10 +347,10 @@ def search(request):
             error_message = "No customer profile is associated with your account."
             return render(request, "pages/search.html", {
                 "lookup_error": error_message,
-                "results": results,
+                "results": [],
             })
         else:
-            base_qs = Reservation.objects.filter(customer=customer)
+            base_qs = Reservation.objects.ordered().filter(customer=customer)
 
     if request.method == "POST":
         search_type = request.POST.get("search_type")  # "email", "name", or "reservation_id"
@@ -342,7 +363,7 @@ def search(request):
             if not email:
                 error_message = "Please enter your email address."
             else:
-                results = base_qs.filter(guest_email__iexact=email).order_by("-start_date")
+                results = base_qs.filter(customer__user__email__iexact=email)
                 if not results:
                     error_message = "No reservations were found for this email address."
 
@@ -361,7 +382,7 @@ def search(request):
                     qs = qs.filter(guest_first_name__icontains=first_name)
                 if last_name:
                     qs = qs.filter(guest_last_name__icontains=last_name)
-                results = qs.order_by("-start_date")
+                results = qs
                 if not results:
                     error_message = "No reservations matched your search."
 
@@ -373,7 +394,9 @@ def search(request):
             if not reservation_id:
                 error_message = "Please enter a reservation ID."
             else:
-                results = base_qs.filter(public_id__iexact=reservation_id)
+                results = Reservation.objects.ordered().filter(
+                            public_id__iexact=reservation_id
+                        )
                 if not results:
                     error_message = "No reservations matched this reservation ID."
 

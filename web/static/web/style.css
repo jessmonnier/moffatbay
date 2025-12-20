@@ -28,14 +28,6 @@ body {
 #content {
     margin: 10px 30px 10px 30px;
 }
-.staff-banner {
-    background-color: #ffeb3b;
-    color: #000;
-    padding: 10px;
-    margin-bottom: 20px;
-    font-weight: bold;
-    border-radius: 4px;
-}
 
 /* Header/Nav Bar */
 header {
@@ -107,6 +99,17 @@ header nav ul li a.active {
     color: green;
     background-color: #e6ffe6;
     border: 1px solid green;
+    padding: 8px 12px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+}
+
+.info-message {
+    background-color: #f1e680;
+    color: #5c5518;
+    border: 1px solid #5c5518;
     padding: 8px 12px;
     border-radius: 5px;
     margin-bottom: 10px;
@@ -296,7 +299,7 @@ footer {
 /* Register page */
 .registerPanel {
     background-color: white;
-    width: 450px;
+    width: 500px;
     margin: auto;
     padding: 20px;
     border-radius: 10px;
@@ -592,6 +595,63 @@ footer {
     text-align: center;
 }
 
+/* Login or register buttons */
+/* Primary button: matches the bold, rounded, high-contrast style */
+.btn {
+    display: inline-block;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+    background-color: #4CAF50; /* green like reserve-button */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none; /* if used as <a> */
+}
+
+.btn:hover:not(:disabled) {
+    background-color: #6de771; /* lighter green on hover */
+    transform: translateY(-1px);
+}
+
+.btn:disabled {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Secondary button: neutral style for Register, similar to hold-button */
+.btn.btn-secondary {
+    display: inline-block;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+    background-color: #888; /* grey like hold-button */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn.btn-secondary:hover:not(:disabled) {
+    background-color: #aaa; /* slightly lighter grey on hover */
+    transform: translateY(-1px);
+}
+
+.btn.btn-secondary:disabled {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
 /* Table styling */
 table.reservation-table {
     width: 100%;
@@ -832,4 +892,47 @@ table.reservation-table tr:hover {
     font-size: 0.95rem;
     margin: 0 12px;
     color: #333;
+}
+
+/* ----------------------------------
+   Status-based row styling
+---------------------------------- */
+
+table.reservations-account {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+table.reservations-account th,
+table.reservations-account td {
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    text-align: center;
+}
+
+table.reservations-account th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+/* Confirmed: pale green */
+.search-Confirmed {
+    background-color: #d9f7e0;
+}
+
+/* Hold: pale yellow */
+.search-Hold {
+    background-color: #fff6dc;
+}
+
+/* Canceled: pale red / gray */
+.search-Cancelled {
+    background-color: #f3cccc;
+    color: #6b2a2a;
+}
+
+/* Hover enhancement (optional but nice) */
+tbody tr:hover {
+    background-color: #eef2f7;
 }

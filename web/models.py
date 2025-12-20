@@ -9,6 +9,7 @@ Developed October thru December of 2025
 from django.db import models
 import uuid
 from django.contrib.auth.models import User
+from django.db.models import Case, When, Value, IntegerField
 
 class Customer(models.Model):
     # One-to-one link with Django User
@@ -137,6 +138,17 @@ class Room(models.Model):
     def __str__(self):
         return f"Room {self.room_number} ({self.room_type.name})"
 
+class ReservationQuerySet(models.QuerySet):
+    def ordered(self):
+        return self.annotate(
+            status_order=Case(
+                When(status='Hold', then=Value(1)),
+                When(status='Confirmed', then=Value(2)),
+                When(status='Cancelled', then=Value(3)),
+                default=Value(99),
+                output_field=IntegerField(),
+            )
+        ).order_by('status_order', '-start_date')
 
 class Reservation(models.Model):
     STATUS_CHOICES = [
@@ -144,6 +156,8 @@ class Reservation(models.Model):
         ('Confirmed', 'Confirmed'),
         ('Cancelled', 'Cancelled'),
     ]
+
+    objects = ReservationQuerySet.as_manager()
     # Use default `id` as primary key
     # But generate a unique public_id for customers to see and use
     public_id = models.CharField(

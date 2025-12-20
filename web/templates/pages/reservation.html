@@ -77,7 +77,11 @@ Developed October thru December of 2025
                 {% for entry in available_room_types %}
                 <tr>
                     <td>
-                        <input type="radio" name="room_type" value="{{ entry.room_type.id }}" required>
+                        <input type="radio" 
+                               name="room_type" 
+                               value="{{ entry.room_type.id }}" 
+                               data-max-guests="{{ entry.room_type.max_guests }}"
+                               required>
                     </td>
                     <td>{{ entry.room_type.name }}</td>
                     <td>${{ entry.price_per_night }}</td>
@@ -124,22 +128,41 @@ Developed October thru December of 2025
                 value="{{ initial_data.guests|default:'' }}">
         </div>
 
-        <!-- Hidden status field -->
-        <input type="hidden" name="status" id="status" value="Confirmed">
+        {% with request.get_full_path as return_url %}
+            {% if user.is_authenticated %}
+            <!-- Hidden status field -->
+            <input type="hidden" name="status" id="status" value="Confirmed">
 
-        <div class="form-buttons">
-        <button type="submit" id="holdButton" class="reservation-button hold-button" onclick="setStatus('Hold')">Hold for 24 Hours</button>
-        <button type="submit" id="reserveButton" class="reservation-button reserve-button" onclick="setStatus('Confirmed')">Confirm Now</button>
-        </div>
+            <div class="form-buttons">
+            <button type="submit" id="holdButton" class="reservation-button hold-button" onclick="setStatus('Hold')">Hold for 24 Hours</button>
+            <button type="submit" id="reserveButton" class="reservation-button reserve-button" onclick="setStatus('Confirmed')">Confirm Now</button>
+            </div>
+            {% else %}
+            <div class="form-buttons">
+            <a href="{% url 'login' %}?next={{ return_url|urlencode }}" class="btn">
+                Log in to Reserve
+            </a>
+            <a href="{% url 'register' %}?next={{ return_url|urlencode }}" class="btn btn-secondary">
+                Register to Reserve
+            </a>
+            </div>
+            {% endif %}
+        {% endwith %}
+        
     </form>
 {% elif searched and not error %}
-    <p>No rooms available for the selected dates and guest count.</p>
+    <p class="info-message">
+        No rooms available for the selected dates and guest count.
+        Note that a single room can house only up to 4 guests.
+    </p>
 {% endif %}
 {% if error %}
     <p class="error-message">{{ error }}</p>
 {% endif %}
+{% if user.is_authenticated %}
 <p>&nbsp;</p>
 <p align="center">Or would you rather <a href="{% url 'search' %}">lookup an existing reservation</a>?</p>
+{% endif %}
 </div>
     <script>
     // function to update hold or confirmed based on which button the customer clicks
@@ -211,6 +234,28 @@ Developed October thru December of 2025
                 document.getElementById("email").value = email;
                 document.getElementById("phone_number").value = phone_number;
             });
+        }
+    });
+
+    const guestsInput = document.getElementById("guests_final");
+
+    function enforceGuestLimit() {
+        const selectedRoom = document.querySelector("input[name='room_type']:checked");
+        if (!selectedRoom) return;
+
+        const maxGuests = parseInt(selectedRoom.dataset.maxGuests, 10);
+        const guests = parseInt(guestsInput.value || 0, 10);
+
+        if (guests > maxGuests) {
+            guestsInput.value = maxGuests;
+            alert(`This room allows a maximum of ${maxGuests} guests.`);
+        }
+    }
+
+    guestsInput.addEventListener("change", enforceGuestLimit);
+    document.addEventListener("change", (e) => {
+        if (e.target.name === "room_type") {
+            enforceGuestLimit();
         }
     });
     </script>

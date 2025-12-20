@@ -11,169 +11,164 @@ Developed October thru December of 2025
 {% block title %}Home | Moffat Bay Lodge{% endblock %}
 
 {% block content %}
-    <div class = "registerContainer">
-        
-        {# Registration information #}
-        <div class = "registerHeader">
-            <h2>Register for an Account</h2>
-            <p>To better protect your private data and ensure ease of finding, modifying, 
-                or canceling reservations, all guests who wish to book a stay at Moffat Bay 
-                Lodge must register for an account. Registration also gives you the benefit of 
-                being able to save payment information for future visits, if desired.
-            </p> <br>
-            <p> Moffat Bay Lodge will never give or sell your personal information to any third
-                party. We make it our mission to ensure the comfort and safety of all guests,
-                both in the digital realm and the physical.
-            </p>
-        </div>
-            {% if messages %}
-                <script>
-                    {% for message in messages %}
-                        alert("{{ message|escapejs }}");
-                    {% endfor %}
-                </script>
+<div class = "registerContainer">
+    {# Registration Panel #}
+    <div class = "registerPanel">
+        {% if messages %}
+            <script>
+                {% for message in messages %}
+                    alert("{{ message|escapejs }}");
+                {% endfor %}
+            </script>
+        {% endif %}
+        <h3>Register for an Account</h3>
+        <p>To better protect your private data and ensure ease of finding, modifying, 
+            or canceling reservations, all guests who wish to book a stay at Moffat Bay 
+            Lodge must register for an account. Registration also gives you the benefit of 
+            being able to save payment information for future visits, if desired.
+        </p> 
+        <p> Moffat Bay Lodge will never give or sell your personal information to any third
+            party. We make it our mission to ensure the comfort and safety of all guests,
+            both in the digital realm and the physical.
+        </p>  <hr> 
+        <h3>Create Your Account</h3>
+        <form method="POST" id="registerForm" action="{% url 'register' %}">
+            {% csrf_token %}
+            {% if next %}
+                <input type="hidden" name="next" value="{{ next|urlencode }}">
             {% endif %}
 
-        {# Registration Panel #}
-        <div class = "registerPanel">
-            <h3>Create Your Account</h3>
-            <form method="POST" id="registerForm" action="{% url 'register' %}">
-                {% csrf_token %}
+            <div class="form-row">
+                <label>First Name:</label>
+                <input type="text" name="first_name" placeholder="Jane">
+            </div>
 
-                <div class="form-row">
-                    <label>First Name:</label>
-                    <input type="text" name="first_name" placeholder="Jane">
+            <div class="form-row">
+                <label>Last Name:</label>
+                <input type="text" name="last_name" placeholder="Doe">
+            </div>
+
+            <div class="form-row">
+                <label>Email:</label>
+                <input type="email" name="email" placeholder="example@gmail.com">
+            </div>
+
+            <div class="form-row">
+                <label>Phone Number:</label>
+                <input type="text" name="phone_number" placeholder="123-456-7890">
+            </div>
+
+            <div class="form-row">
+                <label>Password:</label>
+                <div class="input-with-toggle">
+                    <input type="password" name="password" id="password" required>
+                    <span id="toggleFirstPassword" class="account-password-toggle">👁️</span>
                 </div>
+            </div>
 
-                <div class="form-row">
-                    <label>Last Name:</label>
-                    <input type="text" name="last_name" placeholder="Doe">
+            <div class="form-row">
+                <label>Confirm Password:</label>
+                <div class="input-with-toggle">
+                    <input type="password" name="confirm_password" id="confirm_password" required>
+                    <span id="toggleSecondPassword" class="account-password-toggle">👁️</span>
                 </div>
+            </div>
+            <br>
+            
+            {# Password requirements #}
+            <div class = "passwordRequirments">
+                <p class = "requirement" id="lengthRequirement"><span class="icon bad">✗</span>  Password must be at least 8 characters</p>
+                <p class = "requirement" id="numberRequirement"><span class="icon bad">✗</span> Must include 1 Number</p>
+                <p class = "requirement" id="uppercaseRequirement"><span class="icon bad">✗</span> Must include 1 UPPERCASE Letter</p>
+                <p class = "requirement" id="lowercaseRequirement"><span class="icon bad">✗</span> Must include at least 1 lowercase letter</p>
+                <p class="requirement" id="matchRequirement"><span class="icon bad">✗</span> Passwords must match</p>
+            </div>
 
-                <div class="form-row">
-                    <label>Email:</label>
-                    <input type="email" name="email" placeholder="example@gmail.com">
-                </div>
-
-                <div class="form-row">
-                    <label>Phone Number:</label>
-                    <input type="text" name="phone_number" placeholder="123-456-7890">
-                </div>
-
-                <div class="form-row">
-                    <label>Password:</label>
-                    <div class="input-with-toggle">
-                        <input type="password" name="password" id="password" required>
-                        <span id="toggleFirstPassword" class="account-password-toggle">👁️</span>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <label>Confirm Password:</label>
-                    <div class="input-with-toggle">
-                        <input type="password" name="confirm_password" id="confirm_password" required>
-                        <span id="toggleSecondPassword" class="account-password-toggle">👁️</span>
-                    </div>
-                </div>
-                <br>
-                
-                {# Password requirements #}
-                <div class = "passwordRequirments">
-                    <p class = "requirement" id="lengthRequirement"><span class="icon bad">✗</span>  Password must be at least 8 characters</p>
-                    <p class = "requirement" id="numberRequirement"><span class="icon bad">✗</span> Must include 1 Number</p>
-                    <p class = "requirement" id="uppercaseRequirement"><span class="icon bad">✗</span> Must include 1 UPPERCASE Letter</p>
-                    <p class = "requirement" id="lowercaseRequirement"><span class="icon bad">✗</span> Must include at least 1 lowercase letter</p>
-                </div>
-
-                <div class = "terms">
-                    <label>I agree to the Terms and Conditions</label>
-                    <input type = "checkbox" name="agreedToTerms">
-                </div>
-                <button class="submitButton" id="submitButton">Submit</button>
-            </form>
-        </div>
-
-        <script>
-            const pwd = document.getElementById("password");
-            const confirmPwd = document.getElementById("confirm_password");
-            const submitBtn = document.getElementById("submitButton");
-            const termsCheckbox = document.querySelector("input[name='agreedToTerms']");
-            const firstName = document.querySelector("input[name='first_name']");
-            const lastName = document.querySelector("input[name='last_name']");
-            const email = document.querySelector("input[name='email']");
-            const phone = document.querySelector("input[name='phone_number']");
-
-            function updateReq(id, condition) {
-                const item = document.getElementById(id).querySelector(".icon");
-                if (condition) {
-                    item.textContent = "✓";
-                    item.classList.remove("bad");
-                    item.classList.add("good");
-                } else {
-                    item.textContent = "✗";
-                    item.classList.remove("good");
-                    item.classList.add("bad");
-                }
-            }
-
-            function validate() {
-                const value = pwd.value;
-                const lengthValid = value.length >= 8;
-                const uppercaseValid = /[A-Z]/.test(value);
-                const lowercaseValid = /[a-z]/.test(value);
-                const numberValid = /[0-9]/.test(value);
-                const passwordsMatch = value === confirmPwd.value && value.length > 0;
-
-                // Update visual password requirement indicators
-                updateReq("lengthRequirement", lengthValid);
-                updateReq("uppercaseRequirement", uppercaseValid);
-                updateReq("lowercaseRequirement", lowercaseValid);
-                updateReq("numberRequirement", numberValid);
-
-                // Optional: add a match requirement indicator if you have one
-                if (document.getElementById("match")) {
-                    updateReq("match", passwordsMatch);
-                }
-
-                // Check that all other fields are filled
-                const allFieldsFilled = firstName.value.trim() !== "" &&
-                                        lastName.value.trim() !== "" &&
-                                        email.value.trim() !== "" &&
-                                        phone.value.trim() !== "";
-
-                // Enable submit button only if everything is valid and terms checked
-                submitBtn.disabled = !(lengthValid && uppercaseValid && lowercaseValid && numberValid &&
-                                    passwordsMatch && allFieldsFilled && termsCheckbox.checked);
-            }
-
-            // Attach event listeners to inputs and checkbox
-            [pwd, confirmPwd, firstName, lastName, email, phone].forEach(el => {
-                el.addEventListener("input", validate);
-            });
-            termsCheckbox.addEventListener("change", validate);
-
-            // --- Password Show/Hide Toggle ---
-            function setupToggle(toggleId, inputId) {
-                const toggle = document.getElementById(toggleId);
-                const input = document.getElementById(inputId);
-
-                toggle.addEventListener("click", () => {
-                    const type = input.type === "password" ? "text" : "password";
-                    input.type = type;
-                    toggle.textContent = type === "password" ? "👁️" : "🙈";
-                    toggle.title = type === "password" ? "Show password" : "Hide password";
-                });
-            }
-
-            // Set up all three toggles
-            setupToggle("toggleFirstPassword", "password");
-            setupToggle("toggleSecondPassword", "confirm_password");
-
-
-            // Start with button disabled
-            submitBtn.disabled = true;
-        </script>
-        
-
+            <div class = "terms">
+                <label>I agree to the Terms and Conditions</label>
+                <input type = "checkbox" name="agreedToTerms">
+            </div>
+            <button class="submitButton" id="submitButton">Submit</button>
+        </form>
     </div>
+
+    <script>
+        const pwd = document.getElementById("password");
+        const confirmPwd = document.getElementById("confirm_password");
+        const submitBtn = document.getElementById("submitButton");
+        const termsCheckbox = document.querySelector("input[name='agreedToTerms']");
+        const firstName = document.querySelector("input[name='first_name']");
+        const lastName = document.querySelector("input[name='last_name']");
+        const email = document.querySelector("input[name='email']");
+        const phone = document.querySelector("input[name='phone_number']");
+
+        function updateReq(id, condition) {
+            const item = document.getElementById(id).querySelector(".icon");
+            if (condition) {
+                item.textContent = "✓";
+                item.classList.remove("bad");
+                item.classList.add("good");
+            } else {
+                item.textContent = "✗";
+                item.classList.remove("good");
+                item.classList.add("bad");
+            }
+        }
+
+        function validate() {
+            const value = pwd.value;
+            const lengthValid = value.length >= 8;
+            const uppercaseValid = /[A-Z]/.test(value);
+            const lowercaseValid = /[a-z]/.test(value);
+            const numberValid = /[0-9]/.test(value);
+            const passwordsMatch = value === confirmPwd.value && value.length > 0;
+
+            // Update visual password requirement indicators
+            updateReq("lengthRequirement", lengthValid);
+            updateReq("uppercaseRequirement", uppercaseValid);
+            updateReq("lowercaseRequirement", lowercaseValid);
+            updateReq("numberRequirement", numberValid);
+            updateReq("matchRequirement", passwordsMatch);
+
+            // Check that all other fields are filled
+            const allFieldsFilled = firstName.value.trim() !== "" &&
+                                    lastName.value.trim() !== "" &&
+                                    email.value.trim() !== "" &&
+                                    phone.value.trim() !== "";
+
+            // Enable submit button only if everything is valid and terms checked
+            submitBtn.disabled = !(lengthValid && uppercaseValid && lowercaseValid && numberValid &&
+                                passwordsMatch && allFieldsFilled && termsCheckbox.checked);
+        }
+
+        // Attach event listeners to inputs and checkbox
+        [pwd, confirmPwd, firstName, lastName, email, phone].forEach(el => {
+            el.addEventListener("input", validate);
+        });
+        termsCheckbox.addEventListener("change", validate);
+
+        // --- Password Show/Hide Toggle ---
+        function setupToggle(toggleId, inputId) {
+            const toggle = document.getElementById(toggleId);
+            const input = document.getElementById(inputId);
+
+            toggle.addEventListener("click", () => {
+                const type = input.type === "password" ? "text" : "password";
+                input.type = type;
+                toggle.textContent = type === "password" ? "👁️" : "🙈";
+                toggle.title = type === "password" ? "Show password" : "Hide password";
+            });
+        }
+
+        // Set up all three toggles
+        setupToggle("toggleFirstPassword", "password");
+        setupToggle("toggleSecondPassword", "confirm_password");
+
+
+        // Start with button disabled
+        submitBtn.disabled = true;
+    </script>
+    
+
+</div>
 {% endblock %}

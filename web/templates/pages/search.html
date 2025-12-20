@@ -112,11 +112,12 @@ Developed October thru December of 2025
               <th>Check-out</th>
               <th>Guests</th>
               <th>Total Cost</th>
+              <th>Status</th>
           </tr>
       </thead>
       <tbody>
           {% for r in results %}
-              <tr>
+              <tr class="search-{{ r.status }}">
                   <td><a href="{% url 'reservation_detail' r.public_id %}">{{ r.public_id }}</a></td>
                   <td>{{ r.guest_first_name }} {{ r.guest_last_name }}</td>
                   <td>{{ r.room_type.name }}</td>
@@ -124,6 +125,7 @@ Developed October thru December of 2025
                   <td>{{ r.end_date }}</td>
                   <td>{{ r.guests }}</td>
                   <td>${{ r.total_cost }}</td>
+                  <td>{{ r.status }}</td>
               </tr>
           {% endfor %}
       </tbody>

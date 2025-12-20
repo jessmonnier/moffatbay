@@ -14,14 +14,14 @@ Developed October thru December of 2025
 <div class="registerPanel">
   <h2>Login</h2>
 
-  {% if request.GET.next %}
-    <p class="error-message">
-        You are not logged in. You must log in to access that page.
-    </p>
+  {% if form.errors %}
+    <p style="error-message">Please check your username and password.</p>
   {% endif %}
 
-  {% if form.errors %}
-    <p style="color: red;">Please check your username and password.</p>
+  {% if messages %}
+      {% for message in messages %}
+          <div class="{{ message.tags }}-message">{{ message }}</div>
+      {% endfor %}
   {% endif %}
 <div class=loginForm>
 <form method="post">

@@ -12,31 +12,31 @@ Developed October thru December of 2025
 
 {% block content %}
 
-{% if error %}
-  <div class="error-message">
-    {{ error }}
-  </div>
-{% endif %}
-
-{% if messages %}
-    {% for message in messages %}
-        <div class="{{ message.tags }}-message">{{ message }}</div>
-    {% endfor %}
-{% endif %}
-{% if secondary_email_status %}
-  <div class="success-message">
-    {{ secondary_email_status }}
-  </div>
-{% endif %}
-
-{% if secondary_email_error %}
-  <div class="error-message">
-    {{ secondary_email_error }}
-  </div>
-{% endif %}
-  
 <div style="max-width: 700px; margin: 0 auto; padding: 20px; border: 1px solid #ccc;
             border-radius: 8px; background-color: #fafafa;">
+  
+  {% if error %}
+    <div class="error-message">
+      {{ error }}
+    </div>
+  {% endif %}
+
+  {% if messages %}
+      {% for message in messages %}
+          <div class="{{ message.tags }}-message">{{ message }}</div>
+      {% endfor %}
+  {% endif %}
+  {% if secondary_email_status %}
+    <div class="success-message">
+      {{ secondary_email_status }}
+    </div>
+  {% endif %}
+
+  {% if secondary_email_error %}
+    <div class="error-message">
+      {{ secondary_email_error }}
+    </div>
+  {% endif %}
 
   {# Invalid email warnings #}
   {% if invalid_emails %}
@@ -52,7 +52,9 @@ Developed October thru December of 2025
   {% endif %}
 
   <h2 style="margin-top: 0;">Reservation Summary</h2>
-
+{% if reservation.status == 'Cancelled' %}
+<p class="error-message">This reservation has either been cancelled or was on hold but expired.</p>
+{% else %}
 <button onclick="window.print()" class="print-btn">
     Print Reservation
 </button>
@@ -63,6 +65,7 @@ Developed October thru December of 2025
   {{ reservation.guest_last_name }}.
   Please review your reservation details below:
 </p>
+{% endif %}
 
   <hr />
     
@@ -117,7 +120,7 @@ Developed October thru December of 2025
       <p style="white-space: pre-line;">{{ special_requests }}</p>
     </section>
   {% endif %}
-
+{% if reservation.status != 'Cancelled' %}
   <hr>
 
 <h3>Send Confirmation to Another Email</h3>
@@ -130,12 +133,13 @@ Developed October thru December of 2025
     <input type="email" id="secondary_email" name="secondary_email" required>
     <button type="submit">Send Email</button>
 </form>
+{% endif %}
 
+
+{% if reservation.status == "Cancelled" or reservation.status == "Hold" %}
+  {% if reservation.expiration_time and reservation.start_datetime > now and reservation.expiration_time < now %}
 <hr>
-
-{% if reservation.status == "Hold" %}
-  {% if reservation.expiration_time and reservation.expiration_time < now %}
-      <!-- Hold is expired -->
+  <!-- Hold is expired -->
       <div style="margin: 15px 0; padding: 10px; background: #fff3cd; border: 1px solid #ffeeba;">
         <strong>This reservation hold has expired.</strong>
       </div>
@@ -144,22 +148,23 @@ Developed October thru December of 2025
         {% csrf_token %}
         <button type="submit">Check Availability Again</button>
       </form>
-
-  {% else %}
-      <!-- Hold is still active -->
-      <form method="post" action="{% url 'confirm_hold_reservation' reservation.public_id %}">
-        {% csrf_token %}
-        <button type="submit" style="background: #28a745; color: white;">Confirm Reservation</button>
-      </form>
-
-      <form method="post" action="{% url 'cancel_reservation' reservation.public_id %}" style="margin-top: 10px;">
-        {% csrf_token %}
-        <button type="submit" style="background: #b00020; color: white;">Cancel Reservation</button>
-      </form>
   {% endif %}
 {% endif %}
+{% if reservation.status == "Hold" and reservation.expiration_time and reservation.expiration_time >= now %}
+<hr>      
+  <!-- Hold is still active -->
+  <form method="post" action="{% url 'confirm_hold_reservation' reservation.public_id %}">
+    {% csrf_token %}
+    <button type="submit" style="background: #28a745; color: white;">Confirm Reservation</button>
+  </form>
 
+  <form method="post" action="{% url 'cancel_reservation' reservation.public_id %}" style="margin-top: 10px;">
+    {% csrf_token %}
+    <button type="submit" style="background: #b00020; color: white;">Cancel Reservation</button>
+  </form>
+{% endif %}
 {% if reservation.status == "Confirmed" %}
+<hr>
   {% if can_modify %}
     <form method="get" action="{% url 'reservation_modify' reservation.public_id %}">
       <button type="submit">Modify Reservation</button>
@@ -171,7 +176,7 @@ Developed October thru December of 2025
     </form>
   {% else %}
     <p style="color: #555; font-style: italic;">
-      This reservation cannot be modified or cancelled because it is expired, cancelled, or has already started.
+      This reservation cannot be modified or cancelled because it is cancelled or has already started.
     </p>
   {% endif %}
 {% endif %}
@@ -184,11 +189,12 @@ Developed October thru December of 2025
       Back to Home
     </a>
   </div>
-
+{% if reservation.status != 'Cancelled' %}
   <p style="margin-top: 15px; font-size: 0.9rem; color: #555;">
     If everything looks correct, your reservation has been recorded. You should
     also receive a confirmation email at the address(es) you provided.
   </p>
+{% endif %}
 </div>
 
 

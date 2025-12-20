@@ -10,6 +10,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
+from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required
@@ -17,10 +18,8 @@ from django.core.exceptions import ValidationError
 from ..models import Reservation
 from web.views.helpers import validate_email
 
-def login(request):
-    return render(request, 'pages/login.html')
-
 def register(request):
+    next_url = request.POST.get("next") or request.GET.get("next", "")
     if request.method == "POST":
         first = request.POST.get("first_name")
         last = request.POST.get("last_name")
@@ -55,7 +54,7 @@ def register(request):
             return redirect("register")
 
         # Create user
-        User.objects.create(
+        user = User.objects.create(
             username=email,     # ← Username stored as email
             email=email,
             first_name=first,
@@ -63,10 +62,18 @@ def register(request):
             password=make_password(password)
         )
 
+        # Save the phone number (this goes in Customer, not User)
+        user.customer.phone_number = phone
+        user.customer.save()
+
         messages.success(request, "Account created! Please log in.")
+
+        if next_url:
+            return redirect(f"{reverse('login')}?next={next_url}")
+        
         return redirect("login")
     
-    return render(request, "pages/register.html")
+    return render(request, "pages/register.html", {"next": next_url})
 
 def logout_view(request):
     if request.method == "POST":
@@ -151,8 +158,8 @@ def account(request):
                 messages.success(request, "Password updated successfully.")
 
     # --- Prepare context ---
-    recent_reservations = Reservation.objects.filter(customer=customer).order_by('-start_date')[:5]
-    total_reservations = Reservation.objects.filter(customer=customer).count()
+    recent_reservations = Reservation.objects.ordered().filter(customer=customer)[:5]
+    total_reservations = Reservation.objects.ordered().filter(customer=customer).count()
 
     context = {
         "customer": customer,
