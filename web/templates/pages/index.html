@@ -29,13 +29,84 @@ Developed October thru December of 2025
   </section>
 
     <section id="rooms" class="container">
-      <h3>Rooms & Suites</h3>
-      <p>Short descriptions of accommodations, amenities, and pricing.</p>
-    </section>
+      <div class="roomTitle">
+        <h3>Rooms & Suites</h3>
+        <p>All Rooms include Free Wifi</p>
+      </div>
+      <!--Room Cards-->
+      <div class = "roomContainer">
+        <div class = "roomCard">
+          <img src="{% static 'web/images/doubleFull.jpg' %}" alt="Double Full" >
+          <h4>The Narwhal Suite</h4>
+          <ul>
+            <li>Two Full Sized Beds</li>
+            <li>288 sqft</li>
+            <li>Access to 20 Free Channels</li>
+            <li>$126.00 USD per Night</li>
+          </ul>
+          <a class="btn" href="{% url 'reservation' %}">View Availability</a>
+        </div>
 
+        <div class = "roomCard">
+          <img src="{% static 'web/images/queen.jpg' %}" alt="Queen">
+          <h4>The Beluga Suite</h4>
+          <ul>
+            <li>One Queen Sized Bed</li>
+            <li>350 sqft</li>
+            <li>Access to 40 Free Channels</li>
+            <li>$141.75 USD per Night</li>
+          </ul>
+          <a class="btn" href="{% url 'reservation' %}">View Availability</a>
+        </div>
+
+        <div class = "roomCard">
+          <img src="{% static 'web/images/doubleQueen.jpg' %}" alt="DoubleQueen">
+          <h4>The Sei Suite</h4>
+          <ul>
+            <li>Two Queen Sized Beds</li>
+            <li>500 sqft</li>
+            <li>Access to All Channels</li>
+            <li>Exclusive First Access to Lodge Events</li>
+            <li>$157.50 USD per Night</li>
+          </ul>
+          <a class="btn" href="{% url 'reservation' %}">View Availability</a>
+        </div>
+
+        <div class = "roomCard">
+          <img src="{% static 'web/images/king.jpg' %}" alt="King">
+          <h4>The Blue Suite</h4>
+          <ul>
+            <li>One King Sized Bed</li>
+            <li>650 sqft</li>
+            <li>Access to All Channels</li>
+            <li>Exclusive First Access to Lodge Events</li>
+            <li>Private Balcony</li>
+            <li>$168.00 USD per Night</li>
+          </ul>
+          <a class="btn" href="{% url 'reservation' %}">View Availability</a>
+        </div>
+
+      </div><!--End of Room Container-->
+    </section>
+    <hr>
     <section id="about" class="container">
-      <h3>About Us</h3>
-      <p>One paragraph telling the hotel story or mission.</p>
+      <div class="indexAboutContainer">
+        <div class ="indexAboutText">
+          <h3>About Us</h3>
+          <p>Moffat Bay Lodge is a cozy island retreat offering guests a relaxing escape surrounded
+            by natural beauty and coastal charm. Located near scenic hiking trails, kayaking routes, 
+            whale watching areas, and scuba diving sites, the lodge provides the perfect balance of comfort 
+            and adventure. With thoughtfully designed rooms, modern amenities like free Wi-Fi, 
+            and a welcoming atmosphere, Moffat Bay Lodge serves as an ideal home base for travelers 
+            looking to unwind, explore the outdoors, and experience the peaceful charm of island life.
+            </p>
+        </div>
+
+        <div class = "indexAboutImage">
+          <img src="{% static 'web/images/family.jpg' %}" alt="Family" class="about-image">
+        </div>
+
+      </div>
     </section>
 
     <!-- Salmon image at bottom -->
