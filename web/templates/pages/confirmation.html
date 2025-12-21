@@ -12,190 +12,408 @@ Developed October thru December of 2025
 
 {% block content %}
 
-<div style="max-width: 700px; margin: 0 auto; padding: 20px; border: 1px solid #ccc;
-            border-radius: 8px; background-color: #fafafa;">
-  
-  {% if error %}
-    <div class="error-message">
-      {{ error }}
-    </div>
-  {% endif %}
+<style>
+  .wrap {
+    max-width: 920px;
+    margin: 18px auto;
+    padding: 18px;
+  }
 
-  {% if messages %}
-      {% for message in messages %}
-          <div class="{{ message.tags }}-message">{{ message }}</div>
-      {% endfor %}
-  {% endif %}
-  {% if secondary_email_status %}
-    <div class="success-message">
-      {{ secondary_email_status }}
-    </div>
-  {% endif %}
+  .page-card {
+    border: 1px solid #d9d9d9;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+  }
 
-  {% if secondary_email_error %}
-    <div class="error-message">
-      {{ secondary_email_error }}
-    </div>
-  {% endif %}
+  .page-header {
+    padding: 16px 18px;
+    border-bottom: 1px solid #e8e8e8;
+    background: #f4f7fb;
+  }
 
-  {# Invalid email warnings #}
-  {% if invalid_emails %}
-    <div style="border: 1px solid #b00020; background-color: #ffe5e8;
-                padding: 10px 15px; margin-bottom: 20px; color: #7a0014;">
-      <strong>The following email address(es) were not valid and did not receive a confirmation:</strong>
-      <ul style="margin: 5px 0 0 18px;">
-        {% for e in invalid_emails %}
-          <li>{{ e }}</li>
-        {% endfor %}
-      </ul>
-    </div>
-  {% endif %}
+  .page-header h2 { margin: 0; }
+  .page-header p { margin: 6px 0 0; color: #444; }
 
-  <h2 style="margin-top: 0;">Reservation Summary</h2>
-{% if reservation.status == 'Cancelled' %}
-<p class="error-message">This reservation has either been cancelled or was on hold but expired.</p>
-{% else %}
-<button onclick="window.print()" class="print-btn">
-    Print Reservation
-</button>
+  .content {
+    padding: 18px;
+    background: #fafafa;
+  }
 
-<p>
-  Thank you,
-  {{ reservation.guest_first_name }}
-  {{ reservation.guest_last_name }}.
-  Please review your reservation details below:
-</p>
-{% endif %}
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(260px, 1fr));
+    gap: 14px;
+  }
 
-  <hr />
-    
-  <section style="margin-bottom: 16px;">
-    <h3 style="margin-bottom: 4px;">Reservation Number</h3>
-     <p><strong>{{ reservation.public_id }}</strong></p>
-  </section>
+  @media (max-width: 740px) {
+    .grid { grid-template-columns: 1fr; }
+  }
 
-  <section style="margin-bottom: 16px;">
-  <h3 style="margin-bottom: 4px;">Guest Information</h3>
-  <ul style="list-style: none; padding-left: 0;">
-    <li><strong>Name:</strong> {{ reservation.guest_first_name }} {{ reservation.guest_last_name }}</li>
-    <li><strong>Email:</strong> {{ reservation.guest_email }}</li>
-    <li><strong>Phone:</strong> {{ reservation.guest_phone }}</li>
-  </ul>
-  </section>
+  .card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 14px 14px 10px;
+  }
 
-  <section style="margin-bottom: 16px;">
-  <h3 style="margin-bottom: 4px;">Stay Details</h3>
-  <ul style="list-style: none; padding-left: 0;">
-    <li><strong>Check-in:</strong> {{ reservation.start_date }}</li>
-    <li><strong>Check-out:</strong> {{ reservation.end_date }}</li>
-    <li><strong>Number of Guests:</strong> {{ reservation.guests }}</li>
-    <li><strong>Room Type:</strong> {{ reservation.room_type.name }}</li>
-  </ul>
-  </section>
+  .card h3 {
+    margin: 0 0 10px;
+    font-size: 1.05rem;
+  }
 
-  <section style="margin-bottom: 16px;">
-    <h3 style="margin-bottom: 4px;">Pricing Details</h3>
+  .list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
 
-    {% if price_per_night is not None %}
-      <ul style="list-style: none; padding-left: 0;">
-        <li><strong>Price per night:</strong> ${{ price_per_night|floatformat:2 }}</li>
-        {% if nights %}
-          <li><strong>Nights:</strong> {{ nights }}</li>
+  .list li { margin: 6px 0; color: #222; }
+  .muted { color: #555; }
+
+  .pill {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 0.92rem;
+    border: 1px solid #cfcfcf;
+    background: #f7f7f7;
+  }
+  .pill.Confirmed { border-color: #87c38f; background: #eef9f0; }
+  .pill.Hold      { border-color: #e6c36a; background: #fff7e5; }
+  .pill.Cancelled { border-color: #d99292; background: #fff0f0; }
+
+  .alert {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid;
+    margin: 10px 0 14px;
+    font-weight: 650;
+    background: #fff;
+  }
+  .alert.error   { border-color: #b00020; background: #ffe5e8; color: #7a0014; }
+  .alert.success { border-color: #2f7a3d; background: #e9f7ee; color: #165a25; }
+  .alert.warn    { border-color: #e6c36a; background: #fff7e5; color: #6b5208; }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0 0;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1px solid #1f3d62;
+    background: #2b4f7a;
+    color: #fff;
+    font-weight: 800;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .btn:hover { filter: brightness(0.96); }
+
+  .btn.secondary {
+    background: #fff;
+    color: #1f3d62;
+  }
+
+  .btn.danger {
+    background: #b00020;
+    border-color: #7a0014;
+  }
+
+  .btn.success {
+    background: #28a745;
+    border-color: #1f7c34;
+  }
+
+  .btn.small { padding: 8px 10px; border-radius: 9px; }
+
+  .row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: end;
+  }
+
+  .field {
+    flex: 1 1 240px;
+  }
+
+  .field label {
+    display: block;
+    font-weight: 800;
+    margin: 0 0 6px;
+  }
+
+  .field input {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid #cfcfcf;
+    border-radius: 10px;
+    outline: none;
+  }
+
+  .field input:focus {
+    border-color: #2b4f7a;
+    box-shadow: 0 0 0 2px rgba(43, 79, 122, 0.15);
+  }
+
+  .section-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 0 0 10px;
+  }
+
+  .divider { margin: 14px 0; border: none; border-top: 1px solid #e7e7e7; }
+
+  .total {
+    font-size: 1.15rem;
+    font-weight: 900;
+  }
+
+  .fineprint {
+    margin-top: 12px;
+    font-size: 0.92rem;
+    color: #555;
+  }
+</style>
+
+<div class="wrap">
+  <div class="page-card">
+
+    <div class="page-header">
+      <div class="section-title">
+        <h2>Reservation Summary</h2>
+        {% if reservation.status %}
+          <span class="pill {{ reservation.status }}">{{ reservation.status }}</span>
         {% endif %}
-        {% if total_cost %}
-          <li style="margin-top: 6px;">
-            <strong>Total Cost:</strong>
-            <span style="font-size: 1.1rem;">${{ total_cost|floatformat:2 }}</span>
-          </li>
-        {% endif %}
-      </ul>
-    {% else %}
-      <p style="color: red;">Rate information not found for this room type.</p>
-    {% endif %}
-  </section>
-
-  {% if special_requests %}
-    <section style="margin-bottom: 16px;">
-      <h3 style="margin-bottom: 4px;">Special Requests</h3>
-      <p style="white-space: pre-line;">{{ special_requests }}</p>
-    </section>
-  {% endif %}
-{% if reservation.status != 'Cancelled' %}
-  <hr>
-
-<h3>Send Confirmation to Another Email</h3>
-
-<form action="{% url 'send_secondary_email' %}" method="post" style="margin-top: 10px;">
-    {% csrf_token %}
-    <input type="hidden" name="reservation_id" value="{{ reservation.public_id }}">
-
-    <label for="secondary_email"><strong>Additional Email:</strong></label>
-    <input type="email" id="secondary_email" name="secondary_email" required>
-    <button type="submit">Send Email</button>
-</form>
-{% endif %}
-
-
-{% if reservation.status == "Cancelled" or reservation.status == "Hold" %}
-  {% if reservation.expiration_time and reservation.start_datetime > now and reservation.expiration_time < now %}
-<hr>
-  <!-- Hold is expired -->
-      <div style="margin: 15px 0; padding: 10px; background: #fff3cd; border: 1px solid #ffeeba;">
-        <strong>This reservation hold has expired.</strong>
       </div>
 
-      <form method="post" action="{% url 'retry_hold_availability' reservation.public_id %}">
-        {% csrf_token %}
-        <button type="submit">Check Availability Again</button>
-      </form>
-  {% endif %}
-{% endif %}
-{% if reservation.status == "Hold" and reservation.expiration_time and reservation.expiration_time >= now %}
-<hr>      
-  <!-- Hold is still active -->
-  <form method="post" action="{% url 'confirm_hold_reservation' reservation.public_id %}">
-    {% csrf_token %}
-    <button type="submit" style="background: #28a745; color: white;">Confirm Reservation</button>
-  </form>
+      {% if reservation.status != 'Cancelled' %}
+        <p class="muted">
+          Thank you, {{ reservation.guest_first_name }} {{ reservation.guest_last_name }}.
+          Please review your reservation details below.
+        </p>
+      {% endif %}
+    </div>
 
-  <form method="post" action="{% url 'cancel_reservation' reservation.public_id %}" style="margin-top: 10px;">
-    {% csrf_token %}
-    <button type="submit" style="background: #b00020; color: white;">Cancel Reservation</button>
-  </form>
-{% endif %}
-{% if reservation.status == "Confirmed" %}
-<hr>
-  {% if can_modify %}
-    <form method="get" action="{% url 'reservation_modify' reservation.public_id %}">
-      <button type="submit">Modify Reservation</button>
-    </form>
+    <div class="content">
 
-    <form method="post" action="{% url 'cancel_reservation' reservation.public_id %}" style="margin-top: 10px;">
-      {% csrf_token %}
-      <button type="submit" style="background: #b00020; color: white;">Cancel Reservation</button>
-    </form>
-  {% else %}
-    <p style="color: #555; font-style: italic;">
-      This reservation cannot be modified or cancelled because it is cancelled or has already started.
-    </p>
-  {% endif %}
-{% endif %}
+      {# Messages + alerts #}
+      {% if error %}
+        <div class="alert error">{{ error }}</div>
+      {% endif %}
 
-<hr>
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert {% if message.tags == 'success' %}success{% elif message.tags == 'warning' %}warn{% else %}error{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
 
-  <div style="display: flex; gap: 10px; margin-top: 10px;">
+      {% if secondary_email_status %}
+        <div class="alert success">{{ secondary_email_status }}</div>
+      {% endif %}
 
-    <a href="{% url 'index' %}" style="align-self: center; text-decoration: none;">
-      Back to Home
-    </a>
+      {% if secondary_email_error %}
+        <div class="alert error">{{ secondary_email_error }}</div>
+      {% endif %}
+
+      {% if invalid_emails %}
+        <div class="alert error">
+          <strong>The following email address(es) were not valid and did not receive a confirmation:</strong>
+          <ul style="margin: 8px 0 0 18px;">
+            {% for e in invalid_emails %}
+              <li>{{ e }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      {% if reservation.status == 'Cancelled' %}
+        <div class="alert error">
+          This reservation has either been cancelled or was on hold but expired.
+        </div>
+      {% else %}
+        <div class="actions">
+          <button onclick="window.print()" class="btn small secondary" type="button">Print Reservation</button>
+        </div>
+      {% endif %}
+
+      <hr class="divider" />
+
+      <div class="grid">
+
+        <section class="card">
+          <div class="section-title">
+            <h3 style="margin:0;">Reservation</h3>
+          </div>
+          <ul class="list">
+            <li><strong>Reservation Number:</strong> <span class="total">{{ reservation.public_id }}</span></li>
+          </ul>
+        </section>
+
+        <section class="card">
+          <div class="section-title">
+            <h3 style="margin:0;">Guest Information</h3>
+          </div>
+          <ul class="list">
+            <li><strong>Name:</strong> {{ reservation.guest_first_name }} {{ reservation.guest_last_name }}</li>
+            <li><strong>Email:</strong> {{ reservation.guest_email }}</li>
+            <li><strong>Phone:</strong> {{ reservation.guest_phone }}</li>
+          </ul>
+        </section>
+
+        <section class="card">
+          <div class="section-title">
+            <h3 style="margin:0;">Stay Details</h3>
+          </div>
+          <ul class="list">
+            <li><strong>Check-in:</strong> {{ reservation.start_date }}</li>
+            <li><strong>Check-out:</strong> {{ reservation.end_date }}</li>
+            <li><strong>Guests:</strong> {{ reservation.guests }}</li>
+            <li><strong>Room Type:</strong> {{ reservation.room_type.name }}</li>
+          </ul>
+        </section>
+
+        <section class="card">
+          <div class="section-title">
+            <h3 style="margin:0;">Pricing</h3>
+          </div>
+
+          {% if price_per_night is not None %}
+            <ul class="list">
+              <li><strong>Price per night:</strong> ${{ price_per_night|floatformat:2 }}</li>
+              {% if nights %}
+                <li><strong>Nights:</strong> {{ nights }}</li>
+              {% endif %}
+              {% if total_cost %}
+                <li style="margin-top: 8px;">
+                  <strong>Total Cost:</strong> <span class="total">${{ total_cost|floatformat:2 }}</span>
+                </li>
+              {% endif %}
+            </ul>
+          {% else %}
+            <div class="alert error" style="margin: 0;">
+              Rate information not found for this room type.
+            </div>
+          {% endif %}
+        </section>
+
+      </div>
+
+      {% if special_requests %}
+        <hr class="divider" />
+        <section class="card">
+          <div class="section-title">
+            <h3 style="margin:0;">Special Requests</h3>
+          </div>
+          <p style="margin:0; white-space: pre-line;">{{ special_requests }}</p>
+        </section>
+      {% endif %}
+
+      {% if reservation.status != 'Cancelled' %}
+        <hr class="divider" />
+        <section class="card">
+          <div class="section-title">
+            <h3 style="margin:0;">Send Confirmation to Another Email</h3>
+          </div>
+
+          <p class="muted" style="margin:0 0 10px;">
+            Enter one email address to send an extra copy of this reservation.
+          </p>
+
+          <form action="{% url 'send_secondary_email' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="reservation_id" value="{{ reservation.public_id }}">
+
+            <div class="row">
+              <div class="field">
+                <label for="secondary_email">Additional Email</label>
+                <input type="email" id="secondary_email" name="secondary_email" required>
+              </div>
+              <button class="btn" type="submit">Send Email</button>
+            </div>
+          </form>
+        </section>
+      {% endif %}
+
+      {# Hold / Cancel / Confirm logic preserved #}
+
+      {% if reservation.status == "Cancelled" or reservation.status == "Hold" %}
+        {% if reservation.expiration_time and reservation.start_datetime > now and reservation.expiration_time < now %}
+          <hr class="divider" />
+          <div class="alert warn">
+            <strong>This reservation hold has expired.</strong>
+          </div>
+
+          <form method="post" action="{% url 'retry_hold_availability' reservation.public_id %}">
+            {% csrf_token %}
+            <button class="btn secondary" type="submit">Check Availability Again</button>
+          </form>
+        {% endif %}
+      {% endif %}
+
+      {% if reservation.status == "Hold" and reservation.expiration_time and reservation.expiration_time >= now %}
+        <hr class="divider" />
+        <div class="actions">
+          <form method="post" action="{% url 'confirm_hold_reservation' reservation.public_id %}">
+            {% csrf_token %}
+            <button class="btn success" type="submit">Confirm Reservation</button>
+          </form>
+
+          <form method="post" action="{% url 'cancel_reservation' reservation.public_id %}">
+            {% csrf_token %}
+            <button class="btn danger" type="submit">Cancel Reservation</button>
+          </form>
+        </div>
+      {% endif %}
+
+      {% if reservation.status == "Confirmed" %}
+        <hr class="divider" />
+
+        {% if can_modify %}
+          <div class="actions">
+            <form method="get" action="{% url 'reservation_modify' reservation.public_id %}">
+              <button class="btn secondary" type="submit">Modify Reservation</button>
+            </form>
+
+            <form method="post" action="{% url 'cancel_reservation' reservation.public_id %}">
+              {% csrf_token %}
+              <button class="btn danger" type="submit">Cancel Reservation</button>
+            </form>
+          </div>
+        {% else %}
+          <p class="muted" style="font-style: italic; margin: 0;">
+            This reservation cannot be modified or cancelled because it is cancelled or has already started.
+          </p>
+        {% endif %}
+      {% endif %}
+
+      <hr class="divider" />
+
+      <div class="actions">
+        <a class="btn secondary" href="{% url 'index' %}">Back to Home</a>
+      </div>
+
+      {% if reservation.status != 'Cancelled' %}
+        <p class="fineprint">
+          If everything looks correct, your reservation has been recorded. You should also
+          receive a confirmation email at the address(es) you provided.
+        </p>
+      {% endif %}
+
+    </div>
   </div>
-{% if reservation.status != 'Cancelled' %}
-  <p style="margin-top: 15px; font-size: 0.9rem; color: #555;">
-    If everything looks correct, your reservation has been recorded. You should
-    also receive a confirmation email at the address(es) you provided.
-  </p>
-{% endif %}
 </div>
-
 
 {% endblock %}
