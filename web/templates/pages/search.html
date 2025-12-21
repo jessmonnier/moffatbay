@@ -12,124 +12,252 @@ Developed October thru December of 2025
 
 {% block content %}
 
-<h2>Reservation Search</h2>
+<style>
+  .lookup-wrap { margin-top: 10px; }
+  .lookup-title { margin: 0 0 10px; }
 
-{% if lookup_error %}
-  <p style="color: darkred; font-weight: bold; margin-top: 10px;">
-    {{ lookup_error }}
-  </p>
-{% endif %}
+  .alert {
+    margin: 12px 0 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #b94a48;
+    background: #fff4f4;
+    color: #7a1f1f;
+    font-weight: 600;
+  }
 
-<div style="display: flex; gap: 40px; flex-wrap: wrap; margin-top: 20px;">
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(260px, 1fr));
+    gap: 18px;
+    margin-top: 18px;
+  }
 
-  <!-- Option A: Search by Email -->
-  <div style="flex: 1 1 260px; border: 1px solid #ccc; padding: 15px; border-radius: 6px;">
-    <h3>Search by Email</h3>
-    <p>Find all reservations associated with your account email.</p>
+  @media (max-width: 980px) {
+    .grid { grid-template-columns: repeat(2, minmax(260px, 1fr)); }
+  }
+  @media (max-width: 640px) {
+    .grid { grid-template-columns: 1fr; }
+  }
 
-    <form method="post">
-      {% csrf_token %}
-      <input type="hidden" name="search_type" value="email">
+  .card {
+    border: 1px solid #d9d9d9;
+    border-radius: 10px;
+    padding: 16px;
+    background: #fff;
+  }
 
-      <p>
-        <label for="email"><strong>Email address:</strong></label><br>
-        <input type="email"
-               id="email"
-               name="email"
-               value="{{ form_email|default:request.user.email }}"
-               required
-               style="width: 100%;">
-      </p>
+  .card h3 { margin: 0 0 6px; }
+  .card p  { margin: 0 0 14px; color: #444; }
 
-      <button type="submit">Search by Email</button>
-    </form>
-  </div>
+  .field { margin: 0 0 12px; }
+  .field label { display: block; margin: 0 0 6px; font-weight: 700; }
+  .field input {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid #cfcfcf;
+    border-radius: 8px;
+    outline: none;
+  }
+  .field input:focus {
+    border-color: #2b4f7a;
+    box-shadow: 0 0 0 2px rgba(43, 79, 122, 0.15);
+  }
 
-  <!-- Option B: Search by Name -->
-  <div style="flex: 1 1 260px; border: 1px solid #ccc; padding: 15px; border-radius: 6px;">
-    <h3>Search by Name</h3>
-    <p>Search your reservations using your first and/or last name.</p>
+  .btn {
+    display: inline-block;
+    padding: 9px 12px;
+    border-radius: 8px;
+    border: 1px solid #1f3d62;
+    background: #2b4f7a;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn:hover { filter: brightness(0.95); }
 
-    <form method="post">
-      {% csrf_token %}
-      <input type="hidden" name="search_type" value="name">
+  .divider { margin: 26px 0 14px; }
 
-      <p>
-        <label for="first_name"><strong>First name:</strong></label><br>
-        <input type="text"
-               id="first_name"
-               name="first_name"
-               value="{{ form_first_name }}"
-               style="width: 100%;">
-      </p>
+  .results-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
 
-      <p>
-        <label for="last_name"><strong>Last name:</strong></label><br>
-        <input type="text"
-               id="last_name"
-               name="last_name"
-               value="{{ form_last_name }}"
-               style="width: 100%;">
-      </p>
+  .table-wrap { overflow-x: auto; margin-top: 10px; }
+  table.results {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 860px;
+  }
+  table.results th, table.results td {
+    border-bottom: 1px solid #e6e6e6;
+    padding: 10px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  table.results thead th {
+    position: sticky;
+    top: 0;
+    background: #f4f7fb;
+    border-bottom: 1px solid #d8e3f3;
+    font-weight: 800;
+  }
 
-      <button type="submit">Search by Name</button>
-    </form>
-  </div>
+  .badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    border: 1px solid #cfcfcf;
+    background: #f7f7f7;
+  }
+  .badge.Confirmed { border-color: #87c38f; background: #eef9f0; }
+  .badge.Hold      { border-color: #e6c36a; background: #fff7e5; }
+  .badge.Canceled  { border-color: #d99292; background: #fff0f0; }
 
-<!-- Option C: Search by Reservation ID -->
-<div style="flex: 1 1 260px; border: 1px solid #ccc; padding: 15px; border-radius: 6px;">
-    <h3>Search by Reservation ID</h3>
-    <p>Enter your reservation ID to quickly find a reservation.</p>
+  .muted { color: #555; font-size: 0.95rem; }
+</style>
 
-    <form method="post">
+<div class="lookup-wrap">
+  <h2 class="lookup-title">Reservation Search</h2>
+
+  {% if lookup_error %}
+    <div class="alert">{{ lookup_error }}</div>
+  {% endif %}
+
+  <div class="grid">
+
+    <!-- Option A: Search by Email -->
+    <div class="card">
+      <h3>Search by Email</h3>
+      <p>Find all reservations associated with your account email.</p>
+
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="search_type" value="email">
+
+        <div class="field">
+          <label for="email">Email address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value="{{ form_email|default:request.user.email }}"
+            required
+            autocomplete="email"
+          >
+        </div>
+
+        <button class="btn" type="submit">Search</button>
+      </form>
+    </div>
+
+    <!-- Option B: Search by Name -->
+    <div class="card">
+      <h3>Search by Name</h3>
+      <p>Search your reservations using your first and/or last name.</p>
+
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="search_type" value="name">
+
+        <div class="field">
+          <label for="first_name">First name</label>
+          <input
+            type="text"
+            id="first_name"
+            name="first_name"
+            value="{{ form_first_name }}"
+            autocomplete="given-name"
+          >
+        </div>
+
+        <div class="field">
+          <label for="last_name">Last name</label>
+          <input
+            type="text"
+            id="last_name"
+            name="last_name"
+            value="{{ form_last_name }}"
+            autocomplete="family-name"
+          >
+        </div>
+
+        <button class="btn" type="submit">Search</button>
+      </form>
+    </div>
+
+    <!-- Option C: Search by Reservation ID -->
+    <div class="card">
+      <h3>Search by Reservation ID</h3>
+      <p>Enter your reservation ID to quickly find a reservation.</p>
+
+      <form method="post">
         {% csrf_token %}
         <input type="hidden" name="search_type" value="reservation_id">
 
-        <p>
-            <label for="reservation_id"><strong>Reservation ID:</strong></label><br>
-            <input type="text" id="reservation_id" name="reservation_id"
-                   value="{{ form_reservation_id }}" style="width: 100%;" required>
-        </p>
+        <div class="field">
+          <label for="reservation_id">Reservation ID</label>
+          <input
+            type="text"
+            id="reservation_id"
+            name="reservation_id"
+            value="{{ form_reservation_id }}"
+            required
+            autocomplete="off"
+          >
+        </div>
 
-        <button type="submit">Search by Reservation ID</button>
-    </form>
-</div>
+        <button class="btn" type="submit">Search</button>
+      </form>
+    </div>
 
+  </div>
 
-</div>
+  {% if results %}
+    <hr class="divider">
+    <div class="results-head">
+      <h3 style="margin:0;">Your Reservations</h3>
+      <span class="muted">{{ results|length }} result{{ results|length|pluralize }}</span>
+    </div>
 
-{% if results %}
-  <hr style="margin-top: 30px;">
-  <h3>Your Reservations</h3>
-
-  <table border="1" cellpadding="6" cellspacing="0">
-      <thead>
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
           <tr>
-              <th>Reservation #</th>
-              <th>Guest Name</th>
-              <th>Room Type</th>
-              <th>Check-in</th>
-              <th>Check-out</th>
-              <th>Guests</th>
-              <th>Total Cost</th>
-              <th>Status</th>
+            <th>Reservation #</th>
+            <th>Guest</th>
+            <th>Room Type</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Guests</th>
+            <th>Total Cost</th>
+            <th>Status</th>
           </tr>
-      </thead>
-      <tbody>
+        </thead>
+        <tbody>
           {% for r in results %}
-              <tr class="search-{{ r.status }}">
-                  <td><a href="{% url 'reservation_detail' r.public_id %}">{{ r.public_id }}</a></td>
-                  <td>{{ r.guest_first_name }} {{ r.guest_last_name }}</td>
-                  <td>{{ r.room_type.name }}</td>
-                  <td>{{ r.start_date }}</td>
-                  <td>{{ r.end_date }}</td>
-                  <td>{{ r.guests }}</td>
-                  <td>${{ r.total_cost }}</td>
-                  <td>{{ r.status }}</td>
-              </tr>
+            <tr>
+              <td>
+                <a href="{% url 'reservation_detail' r.public_id %}">{{ r.public_id }}</a>
+              </td>
+              <td>{{ r.guest_first_name }} {{ r.guest_last_name }}</td>
+              <td>{{ r.room_type.name }}</td>
+              <td>{{ r.start_date }}</td>
+              <td>{{ r.end_date }}</td>
+              <td>{{ r.guests }}</td>
+              <td>${{ r.total_cost }}</td>
+              <td><span class="badge {{ r.status }}">{{ r.status }}</span></td>
+            </tr>
           {% endfor %}
-      </tbody>
-  </table>
-{% endif %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+</div>
 
 {% endblock %}
