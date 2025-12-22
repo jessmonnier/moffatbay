@@ -199,64 +199,135 @@ def reservation_modify(request, public_id):
         return redirect("index")
 
     if request.method == "POST":
-        # Gather new dates from form
+        # ---- 1. Parse dates ----
         check_in_str = request.POST.get("check_in")
         check_out_str = request.POST.get("check_out")
 
-        # Validate dates using the helper
         check_in, check_out, error = parse_dates(check_in_str, check_out_str)
         if error:
             messages.error(request, error)
             return redirect("reservation_modify", public_id=public_id)
 
-        # Optionally: validate guest count / room type availability
         guests = int(request.POST.get("guests_final", reservation.guests))
         room_type_id = request.POST.get("room_type", reservation.room_type.id)
+
         available_rooms = get_available_rooms(
-            check_in, check_out,
+            check_in,
+            check_out,
             num_guests=guests,
-            selected_room_type_id=room_type_id
+            selected_room_type_id=room_type_id,
         )
 
         if not available_rooms:
             messages.error(request, "No rooms available for the new dates.")
             return redirect("reservation_modify", public_id=public_id)
 
-        # Save changes
+        # ---- 2. Save updates ----
         reservation.start_date = check_in
         reservation.end_date = check_out
         reservation.guests = guests
         reservation.room_type = get_object_or_404(RoomType, id=room_type_id)
         reservation.save()
 
-        recipients, invalid = validate_emails(reservation.guest_email)
+        # ======================================================
+        # EMAIL LOGIC 
+        # ======================================================
 
-        if recipients:
+        additional_raw = request.POST.get("additional_emails", "").strip()
+
+        # Primary recipients (guest + logged-in user)
+        primary_candidates = [
+            (reservation.guest_email or "").strip(),
+            (getattr(request.user, "email", "") or "").strip(),
+        ]
+
+        primary_valid, primary_invalid = validate_emails(
+            *[e for e in primary_candidates if e]
+        )
+
+        # Additional emails
+        additional_valid = set()
+        additional_invalid = []
+
+        if additional_raw:
+            normalized = additional_raw.replace(";", ",")
+            for addr in normalized.split(","):
+                addr = addr.strip()
+                if not addr:
+                    continue
+                valid_set, invalid_list = validate_emails(addr)
+                if valid_set:
+                    additional_valid.update(valid_set)
+                if invalid_list:
+                    additional_invalid.extend(invalid_list)
+
+        # Remove duplicates
+        primary_valid = set(primary_valid)
+        additional_valid = set(additional_valid) - primary_valid
+
+        all_invalid = list(primary_invalid) + list(additional_invalid)
+
+        # ---- 3. Email primary recipients ----
+        if primary_valid:
             subject = f"Reservation Updated #{reservation.public_id}"
-            body = f"""Dear {reservation.guest_first_name},
+            body = f"""Dear {reservation.guest_first_name} {reservation.guest_last_name},
 
-        Your reservation has been updated successfully.
+Your reservation has been updated successfully.
 
-        Reservation number: {reservation.public_id}
-        Room type: {reservation.room_type.name}
-        Check-in: {reservation.start_date}
-        Check-out: {reservation.end_date}
-        Guests: {reservation.guests}
+Reservation number: {reservation.public_id}
+Room type: {reservation.room_type.name}
+Check-in: {reservation.start_date}
+Check-out: {reservation.end_date}
+Guests: {reservation.guests}
 
-        If you have any questions, please contact us.
-        """
+We look forward to your stay!
+"""
             send_mail(
                 subject,
                 body,
                 settings.DEFAULT_FROM_EMAIL,
-                list(recipients),
-                fail_silently=False,  # important while developing
+                list(primary_valid),
+                fail_silently=False,
+            )
+
+        # ---- 4. Email additional recipients (fun template) ----
+        if additional_valid:
+            subject2 = f"Moffat Bay Lodge Reservation Update #{reservation.public_id}"
+            body2 = f"""Hello,
+
+{reservation.guest_first_name} {reservation.guest_last_name} invites you on a journey to Moffat Bay Lodge.
+
+Updated Reservation Details:
+Reservation number: {reservation.public_id}
+Room type: {reservation.room_type.name}
+Check-in: {reservation.start_date}
+Check-out: {reservation.end_date}
+Guests: {reservation.guests}
+
+We look forward to welcoming you!
+"""
+            send_mail(
+                subject2,
+                body2,
+                settings.DEFAULT_FROM_EMAIL,
+                list(additional_valid),
+                fail_silently=False,
+            )
+
+        # ---- 5. Messages ----
+        if all_invalid:
+            messages.error(
+                request,
+                "These email address(es) were invalid and were not emailed: "
+                + ", ".join(all_invalid)
             )
 
         messages.success(request, "Reservation updated successfully.")
         return redirect("reservation_detail", public_id=reservation.public_id)
 
-    # GET request: prefill form
+    # ===============================
+    # GET REQUEST
+    # ===============================
     initial_data = {
         "check_in": reservation.start_date,
         "check_out": reservation.end_date,
@@ -273,4 +344,5 @@ def reservation_modify(request, public_id):
         "initial_data": initial_data,
         "room_types": RoomType.objects.all().order_by("name"),
     }
+
     return render(request, "pages/reservation_modify.html", context)
