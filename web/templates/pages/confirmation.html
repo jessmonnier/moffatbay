@@ -12,180 +12,6 @@ Developed October thru December of 2025
 
 {% block content %}
 
-<style>
-  .wrap {
-    max-width: 920px;
-    margin: 18px auto;
-    padding: 18px;
-  }
-
-  .page-card {
-    border: 1px solid #d9d9d9;
-    border-radius: 12px;
-    background: #fff;
-    overflow: hidden;
-  }
-
-  .page-header {
-    padding: 16px 18px;
-    border-bottom: 1px solid #e8e8e8;
-    background: #f4f7fb;
-  }
-
-  .page-header h2 { margin: 0; }
-  .page-header p { margin: 6px 0 0; color: #444; }
-
-  .content {
-    padding: 18px;
-    background: #fafafa;
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(260px, 1fr));
-    gap: 14px;
-  }
-
-  @media (max-width: 740px) {
-    .grid { grid-template-columns: 1fr; }
-  }
-
-  .card {
-    background: #fff;
-    border: 1px solid #e5e5e5;
-    border-radius: 12px;
-    padding: 14px 14px 10px;
-  }
-
-  .card h3 {
-    margin: 0 0 10px;
-    font-size: 1.05rem;
-  }
-
-  .list {
-    list-style: none;
-    padding-left: 0;
-    margin: 0;
-  }
-
-  .list li { margin: 6px 0; color: #222; }
-  .muted { color: #555; }
-
-  .pill {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-weight: 800;
-    font-size: 0.92rem;
-    border: 1px solid #cfcfcf;
-    background: #f7f7f7;
-  }
-  .pill.Confirmed { border-color: #87c38f; background: #eef9f0; }
-  .pill.Hold      { border-color: #e6c36a; background: #fff7e5; }
-  .pill.Cancelled { border-color: #d99292; background: #fff0f0; }
-
-  .alert {
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid;
-    margin: 10px 0 14px;
-    font-weight: 650;
-    background: #fff;
-  }
-  .alert.error   { border-color: #b00020; background: #ffe5e8; color: #7a0014; }
-  .alert.success { border-color: #2f7a3d; background: #e9f7ee; color: #165a25; }
-  .alert.warn    { border-color: #e6c36a; background: #fff7e5; color: #6b5208; }
-
-  .actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 10px 0 0;
-  }
-
-  .btn {
-    display: inline-block;
-    padding: 9px 12px;
-    border-radius: 10px;
-    border: 1px solid #1f3d62;
-    background: #2b4f7a;
-    color: #fff;
-    font-weight: 800;
-    cursor: pointer;
-    text-decoration: none;
-  }
-  .btn:hover { filter: brightness(0.96); }
-
-  .btn.secondary {
-    background: #fff;
-    color: #1f3d62;
-  }
-
-  .btn.danger {
-    background: #b00020;
-    border-color: #7a0014;
-  }
-
-  .btn.success {
-    background: #28a745;
-    border-color: #1f7c34;
-  }
-
-  .btn.small { padding: 8px 10px; border-radius: 9px; }
-
-  .row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    align-items: end;
-  }
-
-  .field {
-    flex: 1 1 240px;
-  }
-
-  .field label {
-    display: block;
-    font-weight: 800;
-    margin: 0 0 6px;
-  }
-
-  .field input {
-    width: 100%;
-    padding: 9px 10px;
-    border: 1px solid #cfcfcf;
-    border-radius: 10px;
-    outline: none;
-  }
-
-  .field input:focus {
-    border-color: #2b4f7a;
-    box-shadow: 0 0 0 2px rgba(43, 79, 122, 0.15);
-  }
-
-  .section-title {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin: 0 0 10px;
-  }
-
-  .divider { margin: 14px 0; border: none; border-top: 1px solid #e7e7e7; }
-
-  .total {
-    font-size: 1.15rem;
-    font-weight: 900;
-  }
-
-  .fineprint {
-    margin-top: 12px;
-    font-size: 0.92rem;
-    color: #555;
-  }
-</style>
-
 <div class="wrap">
   <div class="page-card">
 
@@ -251,7 +77,7 @@ Developed October thru December of 2025
 
       <hr class="divider" />
 
-      <div class="grid">
+      <div class="grid-2">
 
         <section class="card">
           <div class="section-title">
@@ -310,16 +136,6 @@ Developed October thru December of 2025
         </section>
 
       </div>
-
-      {% if special_requests %}
-        <hr class="divider" />
-        <section class="card">
-          <div class="section-title">
-            <h3 style="margin:0;">Special Requests</h3>
-          </div>
-          <p style="margin:0; white-space: pre-line;">{{ special_requests }}</p>
-        </section>
-      {% endif %}
 
       {% if reservation.status != 'Cancelled' %}
         <hr class="divider" />
